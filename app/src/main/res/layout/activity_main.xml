@@ -5,11 +5,13 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/blue"
+    android:background="@color/main_background"
     android:orientation="vertical"
     android:paddingHorizontal="@dimen/size_16dp">
 
         <TextView
+            android:fontFamily="@font/ys_display_medium"
+            android:textFontWeight="500"
             android:layout_width="wrap_content"
             android:layout_height="56dp"
             android:layout_gravity="start"
@@ -25,63 +27,25 @@
         android:orientation="vertical">
 
 
-    <Button
+    <Button style="@style/ButtonActivityMain"
         android:id="@+id/search"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1"
         android:text="@string/search"
-        android:textSize="@dimen/text_size_activity_main"
         app:icon="@drawable/ic_inactive_24"
-        app:iconGravity="textStart"
-        app:iconPadding="8dp"
-        app:iconTint="@color/black"
-        app:cornerRadius="@dimen/size_16dp"
-        android:textColor="@color/black"
-        android:backgroundTint="@color/white"
-        android:layout_marginBottom="@dimen/size_16dp"
-        android:insetTop="@dimen/size_0dp"
-        android:insetBottom="@dimen/size_0dp"
         tools:ignore="VisualLintButtonSize" />
 
 
 
-    <Button
+    <Button style="@style/ButtonActivityMain"
         android:id="@+id/medialibrary"
-        android:layout_width="match_parent"
-        android:layout_height="@dimen/size_0dp"
-        android:layout_weight="1"
         android:text="@string/media_library"
-        android:textSize="@dimen/text_size_activity_main"
         app:icon="@drawable/ic_library_24"
-        app:iconGravity="textStart"
-        app:iconPadding="8dp"
-        app:iconTint="@color/black"
-        app:cornerRadius="@dimen/size_16dp"
-        android:textColor="@color/black"
-        android:backgroundTint="@color/white"
-        android:layout_marginBottom="@dimen/size_16dp"
-        android:insetTop="@dimen/size_0dp"
-        android:insetBottom="@dimen/size_0dp"
         tools:ignore="VisualLintButtonSize" />
 
-    <Button
+    <Button style="@style/ButtonActivityMain"
         android:id="@+id/settings"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1"
         android:text="@string/settings"
-        android:textSize="@dimen/text_size_activity_main"
         app:icon="@drawable/ic_settings_24"
-        app:iconGravity="textStart"
-        app:iconPadding="8dp"
-        app:iconTint="@color/black"
-        app:cornerRadius="@dimen/size_16dp"
-        android:textColor="@color/black"
-        android:backgroundTint="@color/white"
         android:layout_marginBottom="28dp"
-        android:insetTop="@dimen/size_0dp"
-        android:insetBottom="@dimen/size_0dp"
         tools:ignore="VisualLintButtonSize" />
     </LinearLayout>
     </LinearLayout>
