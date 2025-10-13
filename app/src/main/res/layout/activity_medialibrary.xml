@@ -10,21 +10,8 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="56dp">
-        <Button
-            android:id="@+id/back"
-            android:layout_width="48dp"
-            android:layout_height="48dp"
-            app:icon="@drawable/ic_arrow_back_24"
-            app:iconTint="@color/black"
-            android:paddingHorizontal="@dimen/size_12dp"
-            android:paddingVertical="@dimen/size_12dp"
-            android:insetTop="@dimen/size_0dp"
-            android:insetBottom="@dimen/size_0dp"
-            android:background="@android:color/transparent"
-            android:stateListAnimator="@null"
-            android:layout_marginStart="4dp"
-            android:layout_marginTop="4dp"
-            android:contentDescription="@string/back"/>
+        <Button style="@style/ButtonBack"
+            android:id="@+id/back" />
 
         <TextView
             android:layout_width="wrap_content"
