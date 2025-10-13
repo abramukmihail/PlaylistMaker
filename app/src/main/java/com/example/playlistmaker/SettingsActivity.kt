@@ -17,18 +17,19 @@ class SettingsActivity : AppCompatActivity() {
         val supportContainer = findViewById<FrameLayout>(R.id.support_container)
         val agreementContainer = findViewById<FrameLayout>(R.id.user_agreement)
         backButton.setOnClickListener { finish() }
-        shareAppContainer.setOnClickListener {shareApp() }
+        shareAppContainer.setOnClickListener { shareApp() }
         supportContainer.setOnClickListener { contactSupport() }
-        agreementContainer.setOnClickListener{transitionAgreement() }
+        agreementContainer.setOnClickListener { transitionAgreement() }
     }
 
     private fun shareApp() {
         val message = resources.getString(R.string.share_message)
         val shareIntent = Intent(Intent.ACTION_SEND)
-        shareIntent.type="text/url"
+        shareIntent.type = "text/url"
         shareIntent.putExtra(Intent.EXTRA_TEXT, message)
         startActivity(shareIntent)
     }
+
     private fun contactSupport() {
         val supportIntent = Intent(Intent.ACTION_SENDTO)
         supportIntent.data = "mailto:".toUri()
@@ -39,8 +40,10 @@ class SettingsActivity : AppCompatActivity() {
     }
 
     private fun transitionAgreement() {
-        val agreementIntent = Intent(Intent.ACTION_VIEW,
-            getString(R.string.practicum_offer).toUri())
+        val agreementIntent = Intent(
+            Intent.ACTION_VIEW,
+            getString(R.string.practicum_offer).toUri()
+        )
         startActivity(agreementIntent)
 
     }
