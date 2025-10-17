@@ -70,6 +70,9 @@ class SearchActivity : AppCompatActivity() {
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
                 clearButton.visibility = clearButtonVisibility(s)
                 currentEditText = s?.toString() ?: EDITTEXT_DEF
+                if (s.isNullOrEmpty()) {
+                    clearErrors()
+                }
             }
             override fun afterTextChanged(s: Editable?) {
                 // empty
@@ -115,7 +118,6 @@ class SearchActivity : AppCompatActivity() {
         nothingFoundLayout.visibility = android.view.View.VISIBLE
         noConnectionLayout.visibility = android.view.View.GONE
         adapter.updateTracks(emptyList())
-        findViewById<EditText>(R.id.searchEditText).text.clear()
         hideKeyboard(findViewById<EditText>(R.id.searchEditText))
     }
     private fun showNoConnection() {
