@@ -12,4 +12,5 @@
     <color name="icon_color_search">#1A1B22</color>
     <color name="text_color_search">#1A1B22</color>
     <color name="color_field_search">#FFFFFF</color>
+    <color name="icon_error">#FFFFFF</color>
 </resources>
