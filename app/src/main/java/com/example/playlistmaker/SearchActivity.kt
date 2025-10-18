@@ -49,6 +49,7 @@ class SearchActivity : AppCompatActivity() {
             adapter.updateTracks(emptyList())
             clearErrors()
         }
+
         refreshButton.setOnClickListener {
             if (lastSearchQuery.isNotEmpty()) {
                 performSearch(lastSearchQuery, adapter)
@@ -119,6 +120,7 @@ class SearchActivity : AppCompatActivity() {
         noConnectionLayout.visibility = android.view.View.GONE
         adapter.updateTracks(emptyList())
         hideKeyboard(findViewById<EditText>(R.id.searchEditText))
+
     }
     private fun showNoConnection() {
         nothingFoundLayout.visibility = android.view.View.GONE
