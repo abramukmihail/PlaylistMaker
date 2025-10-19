@@ -19,4 +19,7 @@
     <string name="artwork_content_description">Album Artwork</string>
     <string name="forward">forward</string>
     <string name="separator_icon_description">separator_icon_description</string>
+    <string name="no_connection">Проблемы со связью\n\nЗагрузка не удалась. Проверьте подключение к интернету</string>
+    <string name="refresh">Обновить</string>
+    <string name="not_found">Ничего не нашлось</string>
 </resources>

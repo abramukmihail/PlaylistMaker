@@ -55,7 +55,9 @@
             android:textColorHint="@color/text_color_search"
             android:textFontWeight="400"
             android:textSize="@dimen/text_size_settings"
-            tools:ignore="Autofill,DuplicateSpeakableTextCheck,RtlSymmetry,TouchTargetSizeCheck,VisualLintTextFieldSize,TextContrastCheck" />
+            tools:ignore="Autofill,DuplicateSpeakableTextCheck,RtlSymmetry,TouchTargetSizeCheck,VisualLintTextFieldSize,TextContrastCheck"
+            android:imeOptions="actionDone"
+            android:singleLine="true"/>
         <ImageView
             android:id="@+id/clear"
             android:layout_width="wrap_content"
@@ -68,6 +70,38 @@
             android:visibility="gone"
             />
     </FrameLayout>
+
+    <LinearLayout
+        android:id="@+id/noConnection"
+        style="@style/ErrorLayout"
+        android:visibility="gone">
+
+        <ImageView
+            style="@style/ErrorImage"
+            android:src="@drawable/ic_no_connection_120" />
+
+        <TextView
+            style="@style/ErrorText"
+            android:text="@string/no_connection" />
+
+        <Button
+            android:id="@+id/refreshButton"
+            style="@style/RefreshButton"
+            android:text="@string/refresh" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/nothingFound"
+        style="@style/ErrorLayout">
+
+        <ImageView
+            android:src="@drawable/ic_not_found_120"
+            style="@style/ErrorImage"/>
+
+        <TextView
+            android:text="@string/not_found"
+            style="@style/ErrorText" />
+    </LinearLayout>
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerView"
         android:layout_width="match_parent"
