@@ -6,6 +6,7 @@ import android.widget.Button
 import android.widget.FrameLayout
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.net.toUri
+import com.google.android.material.switchmaterial.SwitchMaterial
 
 
 class SettingsActivity : AppCompatActivity() {
@@ -16,10 +17,20 @@ class SettingsActivity : AppCompatActivity() {
         val shareAppContainer = findViewById<FrameLayout>(R.id.share_app_container)
         val supportContainer = findViewById<FrameLayout>(R.id.support_container)
         val agreementContainer = findViewById<FrameLayout>(R.id.user_agreement)
+
         backButton.setOnClickListener { finish() }
         shareAppContainer.setOnClickListener { shareApp() }
         supportContainer.setOnClickListener { contactSupport() }
         agreementContainer.setOnClickListener { transitionAgreement() }
+
+        val themeSwitcher = findViewById<SwitchMaterial>(R.id.themeSwitcher)
+        val app = application as? App
+        if (app != null) {
+            themeSwitcher.isChecked = app.darkTheme
+            themeSwitcher.setOnCheckedChangeListener { switcher, checked ->
+                app.switchTheme(checked)
+            }
+        }
     }
 
     private fun shareApp() {
@@ -45,6 +56,6 @@ class SettingsActivity : AppCompatActivity() {
             getString(R.string.practicum_offer).toUri()
         )
         startActivity(agreementIntent)
-
     }
+
 }
