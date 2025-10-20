@@ -5,6 +5,7 @@ import android.text.Editable
 import android.text.TextWatcher
 import android.view.inputmethod.InputMethodManager
 import android.widget.Button
+import android.view.View
 import android.widget.EditText
 import android.widget.ImageView
 import android.widget.LinearLayout
@@ -28,19 +29,39 @@ class SearchActivity : AppCompatActivity() {
     private lateinit var refreshButton: Button
     private lateinit var adapter: TrackAdapter
     private var lastSearchQuery: String = ""
+    private lateinit var searchHistoryLayout: LinearLayout
+    private lateinit var clearHistoryButton: Button
+    private lateinit var historyRecyclerView: RecyclerView
+    private lateinit var historyAdapter: TrackAdapter
+    private lateinit var searchHistory: SearchHistory
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_search)
+
         val backButton = findViewById<Button>(R.id.back)
         val searchEditText = findViewById<EditText>(R.id.searchEditText)
         val clearButton = findViewById<ImageView>(R.id.clear)
         val recyclerView = findViewById<RecyclerView>(R.id.recyclerView)
+        val sharedPreferences = getSharedPreferences("search_history", MODE_PRIVATE)
+
+        searchHistory = SearchHistory(sharedPreferences)
+        searchHistoryLayout = findViewById(R.id.searchHistory)
+        clearHistoryButton = findViewById(R.id.clearHistoryButton)
+        historyRecyclerView = findViewById(R.id.tracksHistory)
         nothingFoundLayout = findViewById(R.id.nothingFound)
         noConnectionLayout = findViewById(R.id.noConnection)
         refreshButton = findViewById(R.id.refreshButton)
-        adapter = TrackAdapter(emptyList())
+
+        adapter = TrackAdapter(emptyList()) { track -> onTrackClick(track) }
+        historyAdapter = TrackAdapter(emptyList()) { track -> onTrackClick(track) }
+
         recyclerView.layoutManager = LinearLayoutManager(this)
         recyclerView.adapter = adapter
+
+        historyRecyclerView.layoutManager = LinearLayoutManager(this)
+        historyRecyclerView.adapter = historyAdapter
+
         backButton.setOnClickListener {finish()}
         clearButton.setOnClickListener {
             searchEditText.text.clear()
@@ -48,6 +69,13 @@ class SearchActivity : AppCompatActivity() {
             hideKeyboard(searchEditText)
             adapter.updateTracks(emptyList())
             clearErrors()
+            updateSearchHistoryVisibility()
+        }
+
+        clearHistoryButton.setOnClickListener {
+            searchHistory.clearSearchHistory()
+            updateHistory()
+            updateSearchHistoryVisibility()
         }
 
         refreshButton.setOnClickListener {
@@ -73,21 +101,45 @@ class SearchActivity : AppCompatActivity() {
                 currentEditText = s?.toString() ?: EDITTEXT_DEF
                 if (s.isNullOrEmpty()) {
                     clearErrors()
+                    adapter.updateTracks(emptyList())
+
                 }
+                updateSearchHistoryVisibility()
             }
             override fun afterTextChanged(s: Editable?) {
                 // empty
             }
         }
         searchEditText.addTextChangedListener(searchTextWatcher)
+        searchEditText.setOnFocusChangeListener { _, hasFocus ->
+            updateSearchHistoryVisibility()
+        }
         searchEditText.requestFocus()
         showKeyboard(searchEditText)
+        updateHistory()
+        updateSearchHistoryVisibility()
+    }
+    private fun onTrackClick(track: Track) {
+        searchHistory.addTrackToHistory(track)
+        updateHistory()
+        hideKeyboard(findViewById(R.id.searchEditText))
+    }
+    private fun updateHistory() {
+        val historyTracks = searchHistory.getSavedTracks()
+        historyAdapter.updateTracks(historyTracks)
+    }
+    private fun updateSearchHistoryVisibility() {
+        val searchEditText = findViewById<EditText>(R.id.searchEditText)
+        val shouldShowHistory = searchEditText.hasFocus() &&
+                searchEditText.text.isEmpty() &&
+                !searchHistory.isHistoryEmpty()
+        searchHistoryLayout.visibility = if (shouldShowHistory) View.VISIBLE else View.GONE
     }
     private fun clearButtonVisibility(s: CharSequence?): Int {
         return if (s.isNullOrEmpty()) {
-            android.view.View.GONE
+            View.GONE
         } else {
-            android.view.View.VISIBLE
+            View.VISIBLE
         }
     }
     private fun performSearch(query: String, adapter: TrackAdapter) {
@@ -116,20 +168,20 @@ class SearchActivity : AppCompatActivity() {
         })
     }
     private fun showNothingFound() {
-        nothingFoundLayout.visibility = android.view.View.VISIBLE
-        noConnectionLayout.visibility = android.view.View.GONE
+        nothingFoundLayout.visibility = View.VISIBLE
+        noConnectionLayout.visibility = View.GONE
         adapter.updateTracks(emptyList())
         hideKeyboard(findViewById<EditText>(R.id.searchEditText))
 
     }
     private fun showNoConnection() {
-        nothingFoundLayout.visibility = android.view.View.GONE
-        noConnectionLayout.visibility = android.view.View.VISIBLE
+        nothingFoundLayout.visibility = View.GONE
+        noConnectionLayout.visibility = View.VISIBLE
         adapter.updateTracks(emptyList())
     }
     private fun clearErrors() {
-        nothingFoundLayout.visibility = android.view.View.GONE
-        noConnectionLayout.visibility = android.view.View.GONE
+        nothingFoundLayout.visibility = View.GONE
+        noConnectionLayout.visibility = View.GONE
     }
     private fun showKeyboard(editText: EditText) {
         val inputMethodManager = getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
@@ -148,6 +200,7 @@ class SearchActivity : AppCompatActivity() {
         super.onRestoreInstanceState(savedInstanceState)
         currentEditText = savedInstanceState.getString(EDITTEXT_KEY, EDITTEXT_DEF)
         findViewById<EditText>(R.id.searchEditText).setText(currentEditText)
+        updateSearchHistoryVisibility()
     }
 
     companion object {

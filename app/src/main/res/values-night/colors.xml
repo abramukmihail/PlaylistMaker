@@ -13,4 +13,7 @@
     <color name="text_color_search">#1A1B22</color>
     <color name="color_field_search">#FFFFFF</color>
     <color name="icon_error">#FFFFFF</color>
+    <color name="switch_track">#9FBBF3</color>
+    <color name="switch_thumb">#3772E7</color>
+    <color name="button_clear">#1A1B22</color>
 </resources>

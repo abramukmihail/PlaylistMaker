@@ -13,5 +13,8 @@
     <color name="text_color_search">#AEAFB4</color>
     <color name="color_field_search">#E6E8EB</color>
     <color name="icon_error">#1A1B22</color>
+    <color name="switch_track">#E6E8EB</color>
+    <color name="switch_thumb">#AEAFB4</color>
+    <color name="button_clear">#FFFFFF</color>
 
 </resources>

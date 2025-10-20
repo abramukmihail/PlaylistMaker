@@ -4,11 +4,13 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/settings_background"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="56dp">
-        <Button style="@style/ButtonBack"
+        <Button
+            style="@style/ButtonBack"
             android:id="@+id/back" />
 
         <TextView
@@ -32,23 +34,29 @@
         <TextView
             style="@style/TextStyleSettings"
             android:text="@string/black_team" />
-        <Switch
+        <com.google.android.material.switchmaterial.SwitchMaterial
+            android:id="@+id/themeSwitcher"
             android:layout_width="56dp"
-            android:layout_height="48dp"
+            android:layout_height="40dp"
             android:layout_gravity="center_vertical|end"
-            android:layout_marginEnd="6dp"
-            tools:ignore="UseSwitchCompatOrMaterialXml"
-            android:checked="true">
-        </Switch>
-        </FrameLayout>
+            android:layout_marginEnd="12dp"
+            android:checked="true"
+            android:thumb="@drawable/switch_thumb"
+            android:track="@drawable/switch_track"
+            app:thumbTint="@color/switch_thumb"
+            app:trackTint="@color/switch_track"
+            tools:ignore="UseSwitchCompatOrMaterialXml,TouchTargetSizeCheck" />
+    </FrameLayout>
     <FrameLayout
         android:id="@+id/share_app_container"
         android:layout_width="match_parent"
         android:layout_height="61dp">
-        <TextView style="@style/TextStyleSettings"
+        <TextView
+            style="@style/TextStyleSettings"
             android:text="@string/share_app" />
 
-        <ImageView style="@style/ImageSettings"
+        <ImageView
+            style="@style/ImageSettings"
             android:importantForAccessibility="no"
             android:src="@drawable/ic_share_24"
             tools:ignore="ImageContrastCheck" />
@@ -60,7 +68,8 @@
         <TextView style="@style/TextStyleSettings"
             android:text="@string/write_to_support" />
 
-        <ImageView style="@style/ImageSettings"
+        <ImageView
+            style="@style/ImageSettings"
             android:importantForAccessibility="no"
             android:src="@drawable/ic_support_24"
             tools:ignore="ImageContrastCheck" />
@@ -69,10 +78,12 @@
         android:id="@+id/user_agreement"
         android:layout_width="match_parent"
         android:layout_height="61dp">
-        <TextView style="@style/TextStyleSettings"
+        <TextView
+            style="@style/TextStyleSettings"
             android:text="@string/user_agreement" />
 
-        <ImageView style="@style/ImageSettings"
+        <ImageView
+            style="@style/ImageSettings"
             android:importantForAccessibility="no"
             android:src="@drawable/ic_arrow_forward_24"
             tools:ignore="ImageContrastCheck" />

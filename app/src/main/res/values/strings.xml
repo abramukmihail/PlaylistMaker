@@ -7,7 +7,7 @@
     <string name="settings">Настройки</string>
     <string name="playlist_maker">Playlist maker</string>
     <string name="back">Назад</string>
-    <string name="black_team">Темная тема</string>
+    <string name="black_team">Тёмная тема</string>
     <string name="share_app">Поделиться приложением</string>
     <string name="write_to_support">Написать в поддержку</string>
     <string name="user_agreement">Пользовательское соглашение</string>
@@ -22,4 +22,6 @@
     <string name="no_connection">Проблемы со связью\n\nЗагрузка не удалась. Проверьте подключение к интернету</string>
     <string name="refresh">Обновить</string>
     <string name="not_found">Ничего не нашлось</string>
+    <string name="search_history">Вы искали</string>
+    <string name="clear_history">Очистить историю</string>
 </resources>
