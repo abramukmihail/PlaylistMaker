@@ -16,5 +16,6 @@
     <color name="switch_track">#E6E8EB</color>
     <color name="switch_thumb">#AEAFB4</color>
     <color name="button_clear">#FFFFFF</color>
+    <color name="button">#1A1B22</color>
 
 </resources>

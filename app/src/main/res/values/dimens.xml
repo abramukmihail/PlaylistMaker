@@ -16,6 +16,12 @@
     <dimen name="size_61dp">61dp</dimen>
     <dimen name="size_6dp">6dp</dimen>
     <dimen name="size_36dp">36dp</dimen>
+    <dimen name="size_4dp">4dp</dimen>
+    <dimen name="cover_radius">8dp</dimen>
+    <dimen name="size_20dp">20dp</dimen>
+    <dimen name="size_54dp">54dp</dimen>
+    <dimen name="size_30dp">30dp</dimen>
+
 
 
 

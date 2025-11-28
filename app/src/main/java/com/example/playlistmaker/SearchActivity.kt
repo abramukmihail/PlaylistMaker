@@ -1,6 +1,7 @@
 package com.example.playlistmaker
 
 import android.os.Bundle
+import android.content.Intent
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.inputmethod.InputMethodManager
@@ -123,6 +124,10 @@ class SearchActivity : AppCompatActivity() {
         searchHistory.addTrackToHistory(track)
         updateHistory()
         hideKeyboard(findViewById(R.id.searchEditText))
+        startActivity(Intent(this, AudioPlayerActivity::class.java).putExtra(
+            AudioPlayerActivity.TRACK_EXTRA,
+            track
+        ))
     }
     private fun updateHistory() {
         val historyTracks = searchHistory.getSavedTracks()
