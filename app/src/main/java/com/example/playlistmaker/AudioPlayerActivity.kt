@@ -23,7 +23,7 @@ class AudioPlayerActivity : AppCompatActivity() {
         private const val STATE_PLAYING = 2
         private const val STATE_PAUSED = 3
         const val TRACK_EXTRA = "track_extra"
-    }
+        private const val TIME_0 = "00:00"   }
 
     private lateinit var trackName: TextView
     private lateinit var artistName: TextView
@@ -112,12 +112,12 @@ class AudioPlayerActivity : AppCompatActivity() {
             mediaPlayer.setOnPreparedListener {
                 playerState = STATE_PREPARED
                 playButton.setImageResource(R.drawable.ic_play_100)
-                remainingTime.text = "00:00"
+                remainingTime.text = TIME_0
             }
             mediaPlayer.setOnCompletionListener {
                 playerState = STATE_PREPARED
                 playButton.setImageResource(R.drawable.ic_play_100)
-                remainingTime.text = "00:00"
+                remainingTime.text = TIME_0
                 handler.removeCallbacks(updateTimeRunnable)
             }
         } catch (e: Exception) {
@@ -184,8 +184,8 @@ class AudioPlayerActivity : AppCompatActivity() {
     }
     override fun onDestroy() {
         super.onDestroy()
-        handler.removeCallbacks(updateTimeRunnable)  // Удаляем обновление времени
-        mediaPlayer.release()  // Освобождаем MediaPlayer
+        handler.removeCallbacks(updateTimeRunnable)
+        mediaPlayer.release()
     }
 
 }

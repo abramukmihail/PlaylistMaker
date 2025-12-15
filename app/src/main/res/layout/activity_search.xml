@@ -105,13 +105,15 @@
             tools:ignore="TouchTargetSizeCheck" />
 
     </LinearLayout>
-    <ProgressBar android:id="@+id/progressBar"
+
+    <ProgressBar
+        android:id="@+id/progressBar"
         android:layout_width="44dp"
         android:layout_height="44dp"
         android:layout_gravity="center"
         android:layout_marginTop="140dp"
         android:indeterminateTint="@color/progress_bar"
-        android:visibility="gone"/>
+        android:visibility="gone" />
     <LinearLayout
         android:id="@+id/noConnection"
         style="@style/ErrorLayout">
