@@ -17,5 +17,8 @@
     <color name="switch_thumb">#AEAFB4</color>
     <color name="button_clear">#FFFFFF</color>
     <color name="button">#1A1B22</color>
+    <color name="progress_bar">#3772E7</color>
+    <color name="button_play">#1A1B22</color>
+
 
 </resources>
