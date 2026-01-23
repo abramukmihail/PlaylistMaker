@@ -60,6 +60,7 @@
             android:textColorHint="@color/text_color_search"
             android:textFontWeight="400"
             android:textSize="@dimen/text_size_settings"
+            android:theme="@style/BlueCursorTheme"
             tools:ignore="Autofill,DuplicateSpeakableTextCheck,RtlSymmetry,TouchTargetSizeCheck,VisualLintTextFieldSize,TextContrastCheck" />
 
         <ImageView

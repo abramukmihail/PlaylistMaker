@@ -21,7 +21,7 @@ class TrackViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         tvArtistName.text = track.artistName
         val millis = track.trackTimeMillis.toLongOrNull() ?: 0L
         tvTrackTime.text = SimpleDateFormat("mm:ss", Locale.getDefault()).format(millis)
-
+        tvArtistName.requestLayout()
         val requestOptions = RequestOptions()
             .transform(RoundedCorners(2))
             .override(45, 45)
