@@ -86,7 +86,7 @@
             app:layout_constraintTop_toBottomOf="@id/artistName"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            android:src="@drawable/ic_stop_100"
+            android:src="@drawable/ic_play_100"
             android:contentDescription="@string/startStop"/>
 
         <TextView style="@style/Text_14sp"
