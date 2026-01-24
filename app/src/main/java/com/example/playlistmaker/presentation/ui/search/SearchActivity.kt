@@ -129,18 +129,23 @@ class SearchActivity : AppCompatActivity(), SearchInteractor.SearchConsumer
         }
         searchEditText.addTextChangedListener(searchTextWatcher)
         searchEditText.setOnFocusChangeListener { _, hasFocus ->
+            if (hasFocus) {
+                updateHistoryList()
+            }
             updateSearchHistoryVisibility()
         }
+
         searchEditText.requestFocus()
         showKeyboard(searchEditText)
 
-        historyInteractor.getSearchHistory().let { history ->
-            historyAdapter.updateTracks(history)
-        }
+        updateHistoryList()
         updateSearchHistoryVisibility()
     }
-
-    override fun consume(foundTracks: List<Track>) {
+        private fun updateHistoryList() {
+            val history = historyInteractor.getSearchHistory()
+            historyAdapter.updateTracks(history)
+        }
+    override fun consume(foundTracks: List<Track>, resultCode: Int) {
         handler.post {
             showProgressBar(false)
             if (foundTracks.isNotEmpty()) {
@@ -148,10 +153,10 @@ class SearchActivity : AppCompatActivity(), SearchInteractor.SearchConsumer
                 nothingFoundLayout.visibility = View.GONE
                 noConnectionLayout.visibility = View.GONE
             } else {
-                if (lastSearchQuery.isNotEmpty()) {
-                    showNoConnection()
-                } else {
-                    showNothingFound()
+                when (resultCode) {
+                    200 -> showNothingFound()
+                    -1 -> showNoConnection()
+                    else -> showNothingFound()
                 }
             }
     }   }
@@ -171,13 +176,15 @@ class SearchActivity : AppCompatActivity(), SearchInteractor.SearchConsumer
         return current
     }
 
-    private fun onTrackClick(track: Track) {
-        historyInteractor.addTrackToHistory(track)
-        hideKeyboard(findViewById(R.id.searchEditText))
-        startActivity(Intent(this, AudioPlayerActivity::class.java).putExtra(
-            AudioPlayerActivity.TRACK_EXTRA,
-            track
-        ))
+        private fun onTrackClick(track: Track) {
+            val updatedHistory = historyInteractor.addTrackToHistory(track)
+            historyAdapter.updateTracks(updatedHistory)
+            updateSearchHistoryVisibility()
+            hideKeyboard(findViewById(R.id.searchEditText))
+            startActivity(Intent(this, AudioPlayerActivity::class.java).putExtra(
+                AudioPlayerActivity.TRACK_EXTRA,
+                track
+            ))
     }
 
     private fun updateSearchHistoryVisibility() {
@@ -250,6 +257,11 @@ class SearchActivity : AppCompatActivity(), SearchInteractor.SearchConsumer
         findViewById<EditText>(R.id.searchEditText).setText(currentEditText)
         updateSearchHistoryVisibility()
     }
+        override fun onResume() {
+            super.onResume()
+            updateHistoryList()
+            updateSearchHistoryVisibility()
+        }
 
     companion object {
         private const val EDITTEXT_KEY = "EDITTEXT_KEY"

@@ -4,17 +4,13 @@ import android.content.SharedPreferences
 import com.example.playlistmaker.domain.api.repository.HistoryRepository
 import com.example.playlistmaker.domain.models.Track
 import com.google.gson.Gson
+import java.util.concurrent.Executor
 import java.util.concurrent.Executors
 
-class HistoryRepositoryImpl(private val sharedPreferences: SharedPreferences) : HistoryRepository {
+class HistoryRepositoryImpl(private val sharedPreferences: SharedPreferences,
+                            private val gson: Gson,
+                            private val executor: Executor) : HistoryRepository {
 
-    private val gson = Gson()
-    private val executor = Executors.newCachedThreadPool()
-
-    companion object {
-        private const val SEARCH_HISTORY_STORAGE = "search_history_storage"
-        private const val HISTORY_LIMIT = 10
-    }
 
     override fun addTrackToHistory(track: Track) {
         executor.execute {
@@ -48,4 +44,9 @@ class HistoryRepositoryImpl(private val sharedPreferences: SharedPreferences) : 
                 .apply()
         }
     }
+        companion object {
+            private const val SEARCH_HISTORY_STORAGE = "search_history"
+            private const val HISTORY_LIMIT = 10
+        }
+
 }

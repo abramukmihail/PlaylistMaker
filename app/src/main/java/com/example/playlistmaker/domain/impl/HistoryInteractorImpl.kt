@@ -6,8 +6,9 @@ import com.example.playlistmaker.domain.models.Track
 
 class HistoryInteractorImpl(private val repository: HistoryRepository) : HistoryInteractor {
 
-    override fun addTrackToHistory(track: Track) {
+    override fun addTrackToHistory(track: Track): List<Track> {
         repository.addTrackToHistory(track)
+        return repository.getSearchHistory()
     }
 
     override fun getSearchHistory(): List<Track> {

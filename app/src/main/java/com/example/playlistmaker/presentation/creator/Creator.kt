@@ -11,6 +11,8 @@ import com.example.playlistmaker.domain.impl.HistoryInteractorImpl
 import com.example.playlistmaker.domain.impl.SearchInteractorImpl
 import com.example.playlistmaker.domain.impl.SettingsInteractorImpl
 import com.example.playlistmaker.data.impl.SettingsRepositoryImpl
+import com.google.gson.Gson
+import java.util.concurrent.Executors
 
 object Creator {
 
@@ -19,7 +21,7 @@ object Creator {
     }
 
     fun provideSearchInteractor(): SearchInteractor {
-        return SearchInteractorImpl(getTrackRepository())
+        return SearchInteractorImpl(getTrackRepository(),Executors.newCachedThreadPool())
     }
 
     fun provideSettingsInteractor(context: Context): SettingsInteractor {
@@ -28,7 +30,9 @@ object Creator {
 
     fun provideHistoryInteractor(context: Context): HistoryInteractor {
         val repository = HistoryRepositoryImpl(
-            context.getSharedPreferences("search_history", Context.MODE_PRIVATE)
+            context.getSharedPreferences("search_history", Context.MODE_PRIVATE),
+                    Gson(),
+            Executors.newCachedThreadPool()
         )
         return HistoryInteractorImpl(repository)
     }
