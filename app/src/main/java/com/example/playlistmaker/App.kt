@@ -20,7 +20,7 @@ class App : Application() {
         super.onCreate()
 
 
-            //stopKoin()
+
 
         startKoin {
             androidLogger()

@@ -8,7 +8,9 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
 
-class PlayerRepositoryImpl : PlayerRepository {
+class PlayerRepositoryImpl (
+    private val mediaPlayerProvider: () -> MediaPlayer
+): PlayerRepository {
 
     private var mediaPlayer: MediaPlayer? = null
 
@@ -22,7 +24,7 @@ class PlayerRepositoryImpl : PlayerRepository {
         _playerState.update { PlayerState.Preparing }
 
         mediaPlayer?.release()
-        mediaPlayer = MediaPlayer().apply {
+        mediaPlayer = mediaPlayerProvider().apply {
             try {
                 if (url.isNullOrEmpty()) {
                     _playerState.update { PlayerState.Default }

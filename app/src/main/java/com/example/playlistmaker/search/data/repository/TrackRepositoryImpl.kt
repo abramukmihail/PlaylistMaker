@@ -18,7 +18,7 @@ import kotlin.collections.toMutableList
 class TrackRepositoryImpl(
     private val networkClient: NetworkClient,
     private val sharedPreferences: SharedPreferences,
-    private val gson: Gson = Gson()
+    private val gson: Gson
 ) : TrackRepository {
 
     override fun searchTracks(term: String): SearchResult {

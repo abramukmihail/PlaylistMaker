@@ -1,7 +1,10 @@
 package com.example.playlistmaker.di
 
 import android.content.Context
+import android.media.MediaPlayer
+import com.example.playlistmaker.player.data.repository.PlayerRepositoryImpl
 import android.content.SharedPreferences
+import com.example.playlistmaker.player.domain.repository.PlayerRepository
 import com.example.playlistmaker.search.data.network.ItunesApi
 import com.example.playlistmaker.search.data.network.NetworkClient
 import com.example.playlistmaker.search.data.network.RetrofitNetworkClient
@@ -54,5 +57,12 @@ val dataModule = module {
 
     single<SettingsRepositoryImpl> {
         SettingsRepositoryImpl(get(named("settings_prefs")))
+    }
+    factory { { MediaPlayer() } }
+
+    single<PlayerRepository> {
+        PlayerRepositoryImpl(
+            mediaPlayerProvider = get()
+        )
     }
 }
