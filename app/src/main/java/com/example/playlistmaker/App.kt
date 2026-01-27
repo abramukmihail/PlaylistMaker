@@ -2,8 +2,8 @@ package com.example.playlistmaker
 
 import android.app.Application
 import androidx.appcompat.app.AppCompatDelegate
-import com.example.playlistmaker.domain.api.SettingsInteractor
-import com.example.playlistmaker.presentation.creator.Creator
+import com.example.playlistmaker.settings.domain.interactor.SettingsInteractor
+import com.example.playlistmaker.creator.Creator
 
 class App : Application() {
     private lateinit var settingsInteractor: SettingsInteractor
