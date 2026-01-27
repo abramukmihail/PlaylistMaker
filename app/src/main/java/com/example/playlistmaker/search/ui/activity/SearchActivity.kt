@@ -12,7 +12,7 @@ import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.example.playlistmaker.creator.Creator
+import org.koin.androidx.viewmodel.ext.android.viewModel
 import com.example.playlistmaker.databinding.ActivitySearchBinding
 import com.example.playlistmaker.player.ui.activity.AudioPlayerActivity
 import com.example.playlistmaker.search.domain.models.SearchState
@@ -23,7 +23,7 @@ import com.example.playlistmaker.search.ui.viewmodel.SearchViewModel
 class SearchActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivitySearchBinding
-    private val viewModel: SearchViewModel by viewModels { Creator.provideSearchViewModelFactory(this) }
+    private val viewModel: SearchViewModel by viewModel()
 
     private var currentEditText: String = EDITTEXT_DEF
     private lateinit var adapter: TrackAdapter

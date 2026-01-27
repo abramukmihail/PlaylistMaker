@@ -7,11 +7,8 @@ import androidx.appcompat.app.AppCompatDelegate
 import com.example.playlistmaker.settings.domain.repository.SettingsRepository
 
 class SettingsRepositoryImpl(
-    context: Context
+    private val sharedPreferences: SharedPreferences
 ) : SettingsRepository {
-
-    private val sharedPreferences: SharedPreferences =
-        context.getSharedPreferences(SHARED_PREFS_NAME, Context.MODE_PRIVATE)
 
     override fun setDarkThemeEnabled(enabled: Boolean) {
         sharedPreferences.edit {

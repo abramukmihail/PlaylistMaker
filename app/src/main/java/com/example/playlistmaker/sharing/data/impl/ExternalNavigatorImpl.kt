@@ -16,7 +16,10 @@ class ExternalNavigatorImpl(
             type = "text/url"
             putExtra(Intent.EXTRA_TEXT, emailData.playStoreUrl)
         }
-        context.startActivity(Intent.createChooser(shareIntent, null))
+
+        val chooserIntent = Intent.createChooser(shareIntent, null)
+        chooserIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+        context.startActivity(chooserIntent)
     }
 
     override fun openEmail(emailData: EmailData) {
@@ -25,12 +28,16 @@ class ExternalNavigatorImpl(
             putExtra(Intent.EXTRA_EMAIL, arrayOf(emailData.supportEmail))
             putExtra(Intent.EXTRA_SUBJECT, emailData.messageTitle)
             putExtra(Intent.EXTRA_TEXT, emailData.message)
+            flags = Intent.FLAG_ACTIVITY_NEW_TASK
         }
-        context.startActivity(emailIntent)
+            context.startActivity(emailIntent)
     }
 
     override fun openLink(emailData: EmailData) {
-        val browserIntent = Intent(Intent.ACTION_VIEW, emailData.userAgreementUrl.toUri())
-        context.startActivity(browserIntent)
+        val browserIntent = Intent(Intent.ACTION_VIEW, emailData.userAgreementUrl.toUri()).apply {
+            flags = Intent.FLAG_ACTIVITY_NEW_TASK
+        }
+            context.startActivity(browserIntent)
     }
 }
+
