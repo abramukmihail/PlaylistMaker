@@ -14,12 +14,11 @@ import com.example.playlistmaker.search.domain.models.Track
 import com.example.playlistmaker.creator.Creator
 import java.text.SimpleDateFormat
 import java.util.Locale
+import android.view.View
+import android.widget.TextView
+import androidx.constraintlayout.widget.Group
 
 class AudioPlayerActivity : AppCompatActivity() {
-    companion object {
-        private const val TIME_0 = "00:00"
-        const val TRACK_EXTRA = "track_extra"
-    }
 
     private lateinit var binding: ActivityAudioPlayerBinding
     private val viewModel: PlayerViewModel by viewModels { Creator.providePlayerViewModelFactory() }
@@ -59,7 +58,7 @@ class AudioPlayerActivity : AppCompatActivity() {
         if (track != null) {
             binding.trackName.text = track.trackName
             binding.artistName.text = track.artistName
-            binding.trackTime.text = SimpleDateFormat("mm:ss", Locale.getDefault()).format(track.trackTimeMillis.toLong())
+            binding.trackTime2.text = SimpleDateFormat("mm:ss", Locale.getDefault()).format(track.trackTimeMillis.toLong())
 
             setupOptionalField(binding.collectionNameGroup, binding.collectionName2, track.collectionName)
             setupOptionalField(binding.releaseDateGroup, binding.releaseDate2, track.releaseDate?.substring(0, 4))
@@ -108,12 +107,12 @@ class AudioPlayerActivity : AppCompatActivity() {
         }
     }
 
-    private fun setupOptionalField(group: androidx.constraintlayout.widget.Group, textView: android.widget.TextView, value: String?) {
+    private fun setupOptionalField(group: Group, textView: TextView, value: String?) {
         if (value.isNullOrEmpty()) {
-            group.visibility = android.view.View.GONE
+            group.visibility = View.GONE
         } else {
             textView.text = value
-            group.visibility = android.view.View.VISIBLE
+            group.visibility = View.VISIBLE
         }
     }
 
@@ -134,5 +133,9 @@ class AudioPlayerActivity : AppCompatActivity() {
         if (viewModel.playerState.value is PlayerState.Playing) {
             viewModel.togglePlayback()
         }
+    }
+    companion object {
+        private const val TIME_0 = "00:00"
+        const val TRACK_EXTRA = "track_extra"
     }
 }

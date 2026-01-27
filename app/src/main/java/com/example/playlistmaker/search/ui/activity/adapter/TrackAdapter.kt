@@ -12,6 +12,8 @@ import com.example.playlistmaker.databinding.ItemTrackBinding
 import com.example.playlistmaker.search.domain.models.Track
 import java.text.SimpleDateFormat
 import java.util.Locale
+import android.content.Context
+import android.util.TypedValue
 
 class TrackAdapter(
     private var tracks: List<Track>,
@@ -24,7 +26,7 @@ class TrackAdapter(
             parent,
             false
         )
-        return TrackViewHolder(binding)
+        return TrackViewHolder(binding,parent.context)
     }
 
     override fun onBindViewHolder(holder: TrackViewHolder, position: Int) {
@@ -43,7 +45,8 @@ class TrackAdapter(
     }
 
     inner class TrackViewHolder(
-        private val binding: ItemTrackBinding
+        private val binding: ItemTrackBinding,
+        private val context: Context
     ) : RecyclerView.ViewHolder(binding.root) {
 
         fun bind(track: Track) {
@@ -54,9 +57,14 @@ class TrackAdapter(
             binding.tvTrackTime.text = SimpleDateFormat("mm:ss", Locale.getDefault()).format(millis)
 
             binding.tvArtistName.requestLayout()
+            val cornerRadiusInPx = TypedValue.applyDimension(
+                TypedValue.COMPLEX_UNIT_DIP,
+                2f, // 2dp
+                context.resources.displayMetrics
+            ).toInt()
 
             val requestOptions = RequestOptions()
-                .transform(RoundedCorners(2))
+                .transform(RoundedCorners(cornerRadiusInPx))
                 .override(45, 45)
 
             Glide.with(binding.root)

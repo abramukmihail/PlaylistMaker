@@ -3,6 +3,8 @@ package com.example.playlistmaker.creator
 import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
+import com.example.playlistmaker.player.data.repository.PlayerRepositoryImpl
+import com.example.playlistmaker.player.domain.repository.PlayerRepository
 import com.example.playlistmaker.player.domain.interactor.PlayerInteractor
 import com.example.playlistmaker.player.domain.interactor.impl.PlayerInteractorImpl
 import com.example.playlistmaker.player.ui.viewmodel.PlayerViewModel
@@ -67,8 +69,11 @@ object Creator {
             }
         }
     }
+    private fun providePlayerRepository(): PlayerRepository {
+        return PlayerRepositoryImpl()
+    }
     private fun providePlayerInteractor(): PlayerInteractor {
-        return PlayerInteractorImpl()
+        return PlayerInteractorImpl(providePlayerRepository())
     }
     fun providePlayerViewModelFactory(): ViewModelProvider.Factory {
         return object : ViewModelProvider.Factory {
