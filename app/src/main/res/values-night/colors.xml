@@ -7,7 +7,7 @@
     <color name="text_color">#FFFFFF</color>
     <color name="icon_color">#FFFFFF</color>
     <color name="main_background">#1A1B22</color>
-    <color name="settings_background">#1A1B22</color>
+    <color name="background">#1A1B22</color>
     <color name="icon_back_color">#FFFFFF</color>
     <color name="icon_color_search">#1A1B22</color>
     <color name="text_color_search">#1A1B22</color>
