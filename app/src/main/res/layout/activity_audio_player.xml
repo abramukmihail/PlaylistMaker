@@ -3,7 +3,7 @@
 <androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/settings_background"
+    android:background="@color/background"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools">
 
@@ -35,7 +35,7 @@
             app:layout_constraintEnd_toEndOf="parent"
             android:contentDescription="@string/art"/>
 
-        <TextView style="@style/TextTrackPlayer"
+        <TextView style="@style/TextSize22"
             android:id="@+id/trackName"
             android:layout_width="0dp"
             android:maxLines="1"

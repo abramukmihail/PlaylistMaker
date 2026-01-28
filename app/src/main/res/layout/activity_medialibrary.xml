@@ -1,27 +1,37 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/white"
+    android:background="@color/background"
     android:orientation="vertical">
 
-    <LinearLayout
+    <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="56dp">
-        <Button style="@style/ButtonBack"
-            android:id="@+id/back" />
+        android:layout_height="wrap_content"
+        >
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="start"
+        <Button
+            android:id="@+id/back"
+            style="@style/ButtonBack"
+            android:contentDescription="@string/title" />
+
+        <TextView style="@style/TextSize22"
             android:text="@string/media_library"
-            android:textColor="@color/black"
-            android:textSize="22sp"
-            android:paddingStart="@dimen/size_12dp"
-            android:paddingTop="14dp"
-            tools:ignore="RtlSymmetry" />
-    </LinearLayout>
+            android:layout_marginStart="@dimen/size_12dp"
+            android:layout_marginTop="14dp"
+            android:layout_toEndOf="@+id/back"/>
+    </RelativeLayout>
+
+    <com.google.android.material.tabs.TabLayout
+        style="@style/TabLayoutStyle"
+        android:id="@+id/tabLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:tabIndicator="@drawable/tab_indicator" />
+
+    <androidx.viewpager2.widget.ViewPager2
+        android:id="@+id/viewPager"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"/>
 </LinearLayout>
