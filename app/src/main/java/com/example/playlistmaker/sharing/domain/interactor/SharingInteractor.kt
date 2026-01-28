@@ -6,5 +6,4 @@ interface SharingInteractor {
     fun shareApp()
     fun contactSupport()
     fun transitionAgreement()
-    val emailData: EmailData
 }

@@ -6,7 +6,7 @@ import com.example.playlistmaker.sharing.domain.navigator.ExternalNavigator
 
 class SharingInteractorImpl(
     private val externalNavigator: ExternalNavigator,
-    override val emailData: EmailData
+    private val emailData: EmailData
 ) : SharingInteractor {
 
     override fun shareApp() = externalNavigator.shareLink(emailData)
