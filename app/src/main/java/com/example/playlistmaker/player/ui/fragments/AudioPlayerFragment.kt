@@ -1,32 +1,45 @@
-package com.example.playlistmaker.player.ui.activity
+package com.example.playlistmaker.player.ui.fragments
 
 import android.os.Bundle
-import androidx.activity.viewModels
-import androidx.appcompat.app.AppCompatActivity
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import androidx.fragment.app.Fragment
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import com.example.playlistmaker.R
-import com.example.playlistmaker.databinding.ActivityAudioPlayerBinding
+import com.example.playlistmaker.databinding.FragmentAudioPlayerBinding
 import com.example.playlistmaker.player.domain.models.PlaybackProgress
 import com.example.playlistmaker.player.domain.models.PlayerState
 import com.example.playlistmaker.player.ui.viewmodel.PlayerViewModel
 import com.example.playlistmaker.search.domain.models.Track
-import org.koin.androidx.viewmodel.ext.android.viewModel
 import java.text.SimpleDateFormat
 import java.util.Locale
-import android.view.View
-import android.widget.TextView
-import androidx.constraintlayout.widget.Group
+import kotlinx.coroutines.launch
+import org.koin.androidx.viewmodel.ext.android.viewModel
 
-class AudioPlayerActivity : AppCompatActivity() {
+class AudioPlayerFragment : Fragment() {
 
-    private lateinit var binding: ActivityAudioPlayerBinding
+    private var _binding: FragmentAudioPlayerBinding? = null
+    private val binding get() = _binding!!
+
     private val viewModel: PlayerViewModel by viewModel()
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        binding = ActivityAudioPlayerBinding.inflate(layoutInflater)
-        setContentView(binding.root)
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View {
+        _binding = FragmentAudioPlayerBinding.inflate(inflater, container, false)
+        return binding.root
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+
 
         setupClickListeners()
         setupObservers()
@@ -35,7 +48,7 @@ class AudioPlayerActivity : AppCompatActivity() {
 
     private fun setupClickListeners() {
         binding.back.setOnClickListener {
-            finish()
+            requireActivity().onBackPressed()
         }
         binding.startStop.setOnClickListener {
             viewModel.togglePlayback()
@@ -43,22 +56,23 @@ class AudioPlayerActivity : AppCompatActivity() {
     }
 
     private fun setupObservers() {
-        viewModel.playerState.observe(this) { state ->
+        viewModel.playerState.observe(viewLifecycleOwner) { state ->
             updatePlayerState(state)
         }
 
-        viewModel.playbackProgress.observe(this) { progress ->
+        viewModel.playbackProgress.observe(viewLifecycleOwner) { progress ->
             updatePlaybackProgress(progress)
         }
     }
 
     private fun showTrack() {
-        val track = intent.getSerializableExtra(TRACK_EXTRA) as? Track
+        val track = arguments?.getParcelable<Track>(TRACK_EXTRA)
 
         if (track != null) {
             binding.trackName.text = track.trackName
             binding.artistName.text = track.artistName
-            binding.trackTime2.text = SimpleDateFormat("mm:ss", Locale.getDefault()).format(track.trackTimeMillis.toLong())
+            binding.trackTime2.text = SimpleDateFormat("mm:ss", Locale.getDefault())
+                .format(track.trackTimeMillis.toLong())
 
             setupOptionalField(binding.collectionNameGroup, binding.collectionName2, track.collectionName)
             setupOptionalField(binding.releaseDateGroup, binding.releaseDate2, track.releaseDate?.substring(0, 4))
@@ -73,6 +87,10 @@ class AudioPlayerActivity : AppCompatActivity() {
     private fun updatePlayerState(state: PlayerState) {
         when (state) {
             is PlayerState.Default -> {
+                binding.startStop.setImageResource(R.drawable.ic_play_100)
+                binding.startStop.isEnabled = false
+            }
+            is PlayerState.Idle -> {
                 binding.startStop.setImageResource(R.drawable.ic_play_100)
                 binding.startStop.isEnabled = false
             }
@@ -96,6 +114,7 @@ class AudioPlayerActivity : AppCompatActivity() {
                 binding.startStop.setImageResource(R.drawable.ic_play_100)
                 binding.startStop.isEnabled = true
             }
+
         }
     }
 
@@ -107,7 +126,7 @@ class AudioPlayerActivity : AppCompatActivity() {
         }
     }
 
-    private fun setupOptionalField(group: Group, textView: TextView, value: String?) {
+    private fun setupOptionalField(group: androidx.constraintlayout.widget.Group, textView: android.widget.TextView, value: String?) {
         if (value.isNullOrEmpty()) {
             group.visibility = View.GONE
         } else {
@@ -128,14 +147,31 @@ class AudioPlayerActivity : AppCompatActivity() {
 
     override fun onPause() {
         super.onPause()
-        if (isChangingConfigurations) return
+        if (isRemoving) return
 
-        if (viewModel.playerState.value is PlayerState.Playing) {
-            viewModel.togglePlayback()
+        viewModel.playerState.value?.let { state ->
+            if (state is PlayerState.Playing) {
+                viewModel.togglePlayback()
+            }
         }
     }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
+    }
+
     companion object {
         private const val TIME_0 = "00:00"
         const val TRACK_EXTRA = "track_extra"
+
+        fun newInstance(track: Track): AudioPlayerFragment {
+            return AudioPlayerFragment().apply {
+                arguments = Bundle().apply {
+                    putParcelable(TRACK_EXTRA, track)
+                }
+            }
+        }
     }
+
 }

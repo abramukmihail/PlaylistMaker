@@ -1,4 +1,4 @@
-package com.example.playlistmaker.search.ui.activity
+package com.example.playlistmaker.search.ui.fragments
 
 import android.content.Intent
 import android.os.Bundle
@@ -6,23 +6,33 @@ import android.os.Handler
 import android.os.Looper
 import android.text.Editable
 import android.text.TextWatcher
+import android.view.LayoutInflater
+import android.view.ViewGroup
 import android.view.View
 import android.view.inputmethod.InputMethodManager
+import android.widget.EditText
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContentProviderCompat.requireContext
+import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import org.koin.androidx.viewmodel.ext.android.viewModel
-import com.example.playlistmaker.databinding.ActivitySearchBinding
-import com.example.playlistmaker.player.ui.activity.AudioPlayerActivity
+import com.example.playlistmaker.databinding.FragmentSearchBinding
 import com.example.playlistmaker.search.domain.models.SearchState
 import com.example.playlistmaker.search.domain.models.Track
 import com.example.playlistmaker.search.ui.activity.adapter.TrackAdapter
 import com.example.playlistmaker.search.ui.viewmodel.SearchViewModel
+import com.example.playlistmaker.player.ui.fragments.AudioPlayerFragment
+import androidx.fragment.app.Fragment
+import androidx.navigation.fragment.findNavController
+import com.example.playlistmaker.R
 
-class SearchActivity : AppCompatActivity() {
 
-    private lateinit var binding: ActivitySearchBinding
+class SearchFragment : Fragment() {
+
+    private var _binding: FragmentSearchBinding? = null
+    private val binding get() = _binding!!
     private val viewModel: SearchViewModel by viewModel()
 
     private var currentEditText: String = EDITTEXT_DEF
@@ -32,10 +42,17 @@ class SearchActivity : AppCompatActivity() {
     private var isClickAllowed = true
     private val searchRunnable = Runnable { performSearch(currentEditText) }
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        binding = ActivitySearchBinding.inflate(layoutInflater)
-        setContentView(binding.root)
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View {
+        _binding = FragmentSearchBinding.inflate(inflater, container, false)
+        return binding.root
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
 
         adapter = TrackAdapter(emptyList()) { track ->
             if (clickDebounce()) {
@@ -51,28 +68,38 @@ class SearchActivity : AppCompatActivity() {
         setupViews()
         setupObservers()
         loadSearchHistory()
+
+        savedInstanceState?.let {
+            currentEditText = it.getString(EDITTEXT_KEY, EDITTEXT_DEF)
+            binding.searchEditText.setText(currentEditText)
+        }
+    }
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        outState.putString(EDITTEXT_KEY, currentEditText)
     }
 
     private fun setupViews() {
         with(binding) {
-            recyclerView.layoutManager = LinearLayoutManager(this@SearchActivity)
+            recyclerView.layoutManager = LinearLayoutManager(requireContext())
             recyclerView.adapter = adapter
 
-            tracksHistory.layoutManager = LinearLayoutManager(this@SearchActivity)
+            tracksHistory.layoutManager = LinearLayoutManager(requireContext())
             tracksHistory.adapter = historyAdapter
-
-            back.setOnClickListener { finish() }
 
             clear.setOnClickListener {
                 searchEditText.text.clear()
                 searchEditText.clearFocus()
                 hideKeyboard(searchEditText)
+                viewModel.cancelSearch()
                 adapter.updateTracks(emptyList())
                 clearErrors()
                 updateSearchHistoryVisibility()
             }
 
             clearHistoryButton.setOnClickListener {
+                searchEditText.clearFocus()
+                hideKeyboard(searchEditText)
                 viewModel.clearHistory()
             }
 
@@ -92,6 +119,7 @@ class SearchActivity : AppCompatActivity() {
                     currentEditText = s?.toString() ?: EDITTEXT_DEF
                     if (s.isNullOrEmpty()) {
                         clearErrors()
+                        viewModel.cancelSearch()
                         adapter.updateTracks(emptyList())
                         viewModel.loadHistory()
                     } else {
@@ -119,11 +147,11 @@ class SearchActivity : AppCompatActivity() {
     }
 
     private fun setupObservers() {
-        viewModel.searchState.observe(this) { state ->
+        viewModel.searchState.observe(viewLifecycleOwner) { state ->
             handleSearchState(state)
         }
 
-        viewModel.historyState.observe(this) { history ->
+        viewModel.historyState.observe(viewLifecycleOwner) { history ->
             historyAdapter.updateTracks(history)
             updateSearchHistoryVisibility()
         }
@@ -177,11 +205,13 @@ class SearchActivity : AppCompatActivity() {
         viewModel.addToSearchHistory(track)
         updateSearchHistoryVisibility()
         hideKeyboard(binding.searchEditText)
-        startActivity(
-            Intent(this, AudioPlayerActivity::class.java).putExtra(
-                AudioPlayerActivity.Companion.TRACK_EXTRA,
-                track
-            )
+        val bundle = Bundle().apply {
+            putParcelable(AudioPlayerFragment.TRACK_EXTRA, track)
+        }
+
+        findNavController().navigate(
+            R.id.action_searchFragment_to_audioPlayerFragment,
+            bundle
         )
     }
 
@@ -255,26 +285,21 @@ class SearchActivity : AppCompatActivity() {
         }
     }
 
-    private fun showKeyboard(editText: android.widget.EditText) {
-        val inputMethodManager = getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
-        inputMethodManager.showSoftInput(editText, InputMethodManager.SHOW_IMPLICIT)
+    private fun showKeyboard(editText: EditText) {
+        val inputMethodManager = ContextCompat.getSystemService(
+            requireContext(),
+            InputMethodManager::class.java
+        )
+        inputMethodManager?.showSoftInput(editText, InputMethodManager.SHOW_IMPLICIT)
     }
+
 
     private fun hideKeyboard(editText: android.widget.EditText) {
-        val inputMethodManager = getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
-        inputMethodManager.hideSoftInputFromWindow(editText.windowToken, 0)
-    }
-
-    override fun onSaveInstanceState(outState: Bundle) {
-        super.onSaveInstanceState(outState)
-        outState.putString(EDITTEXT_KEY, currentEditText)
-    }
-
-    override fun onRestoreInstanceState(savedInstanceState: Bundle) {
-        super.onRestoreInstanceState(savedInstanceState)
-        currentEditText = savedInstanceState.getString(EDITTEXT_KEY, EDITTEXT_DEF)
-        binding.searchEditText.setText(currentEditText)
-        updateSearchHistoryVisibility()
+        val inputMethodManager = ContextCompat.getSystemService(
+            requireContext(),
+            InputMethodManager::class.java
+        )
+        inputMethodManager?.hideSoftInputFromWindow(editText.windowToken, 0)
     }
 
     override fun onResume() {
@@ -283,10 +308,17 @@ class SearchActivity : AppCompatActivity() {
         updateSearchHistoryVisibility()
     }
 
+override fun onDestroyView() {
+    super.onDestroyView()
+    handler.removeCallbacks(searchRunnable)
+    _binding = null
+}
+
     companion object {
         private const val EDITTEXT_KEY = "EDITTEXT_KEY"
         private const val EDITTEXT_DEF = ""
         private const val SEARCH_DEBOUNCE_DELAY = 2000L
         private const val CLICK_DEBOUNCE_DELAY = 1000L
     }
+
 }

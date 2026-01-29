@@ -98,5 +98,6 @@ class SearchViewModel(
     fun cancelSearch() {
         searchJob?.cancel()
         debounceJob?.cancel()
+        _searchState.value = SearchState.Empty
     }
 }
