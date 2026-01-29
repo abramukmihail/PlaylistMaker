@@ -74,6 +74,7 @@ class SearchFragment : Fragment() {
             binding.searchEditText.setText(currentEditText)
         }
     }
+
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
         outState.putString(EDITTEXT_KEY, currentEditText)
@@ -110,7 +111,12 @@ class SearchFragment : Fragment() {
             }
 
             val searchTextWatcher = object : TextWatcher {
-                override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
+                override fun beforeTextChanged(
+                    s: CharSequence?,
+                    start: Int,
+                    count: Int,
+                    after: Int
+                ) {
                     // empty
                 }
 
@@ -162,13 +168,16 @@ class SearchFragment : Fragment() {
             is SearchState.Empty -> {
                 showSearchHistory()
             }
+
             is SearchState.Loading -> {
                 showProgressBar(true)
             }
+
             is SearchState.EmptyResult -> {
                 showProgressBar(false)
                 showNothingFound()
             }
+
             is SearchState.Content -> {
                 showProgressBar(false)
                 adapter.updateTracks(state.tracks)
@@ -176,10 +185,12 @@ class SearchFragment : Fragment() {
                 binding.noConnection.visibility = View.GONE
                 binding.recyclerView.visibility = View.VISIBLE
             }
+
             is SearchState.Error.NoConnection -> {
                 showProgressBar(false)
                 showNoConnection()
             }
+
             is SearchState.Error.NetworkError -> {
                 showProgressBar(false)
                 showNoConnection()
@@ -308,11 +319,11 @@ class SearchFragment : Fragment() {
         updateSearchHistoryVisibility()
     }
 
-override fun onDestroyView() {
-    super.onDestroyView()
-    handler.removeCallbacks(searchRunnable)
-    _binding = null
-}
+    override fun onDestroyView() {
+        super.onDestroyView()
+        handler.removeCallbacks(searchRunnable)
+        _binding = null
+    }
 
     companion object {
         private const val EDITTEXT_KEY = "EDITTEXT_KEY"

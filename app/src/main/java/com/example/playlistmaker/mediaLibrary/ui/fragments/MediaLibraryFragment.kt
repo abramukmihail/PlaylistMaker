@@ -41,7 +41,7 @@ class MediaLibraryFragment : Fragment() {
             binding.tabLayout,
             binding.viewPager
         ) { tab, position ->
-            when(position) {
+            when (position) {
                 0 -> tab.text = getString(R.string.favourites)
                 1 -> tab.text = getString(R.string.playlists)
             }

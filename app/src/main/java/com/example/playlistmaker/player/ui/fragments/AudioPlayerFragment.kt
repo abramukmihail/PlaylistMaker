@@ -5,6 +5,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.navigation.fragment.findNavController
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import com.bumptech.glide.Glide
@@ -48,7 +49,7 @@ class AudioPlayerFragment : Fragment() {
 
     private fun setupClickListeners() {
         binding.back.setOnClickListener {
-            requireActivity().onBackPressed()
+            findNavController().popBackStack()
         }
         binding.startStop.setOnClickListener {
             viewModel.togglePlayback()
@@ -74,9 +75,21 @@ class AudioPlayerFragment : Fragment() {
             binding.trackTime2.text = SimpleDateFormat("mm:ss", Locale.getDefault())
                 .format(track.trackTimeMillis.toLong())
 
-            setupOptionalField(binding.collectionNameGroup, binding.collectionName2, track.collectionName)
-            setupOptionalField(binding.releaseDateGroup, binding.releaseDate2, track.releaseDate?.substring(0, 4))
-            setupOptionalField(binding.primaryGenreNameGroup, binding.primaryGenreName2, track.primaryGenreName)
+            setupOptionalField(
+                binding.collectionNameGroup,
+                binding.collectionName2,
+                track.collectionName
+            )
+            setupOptionalField(
+                binding.releaseDateGroup,
+                binding.releaseDate2,
+                track.releaseDate?.substring(0, 4)
+            )
+            setupOptionalField(
+                binding.primaryGenreNameGroup,
+                binding.primaryGenreName2,
+                track.primaryGenreName
+            )
             setupOptionalField(binding.countryGroup, binding.country2, track.country)
 
             loadArtwork(track)
@@ -90,26 +103,32 @@ class AudioPlayerFragment : Fragment() {
                 binding.startStop.setImageResource(R.drawable.ic_play_100)
                 binding.startStop.isEnabled = false
             }
+
             is PlayerState.Idle -> {
                 binding.startStop.setImageResource(R.drawable.ic_play_100)
                 binding.startStop.isEnabled = false
             }
+
             is PlayerState.Preparing -> {
                 binding.startStop.setImageResource(R.drawable.ic_play_100)
                 binding.startStop.isEnabled = false
             }
+
             is PlayerState.Prepared -> {
                 binding.startStop.setImageResource(R.drawable.ic_play_100)
                 binding.startStop.isEnabled = true
             }
+
             is PlayerState.Playing -> {
                 binding.startStop.setImageResource(R.drawable.ic_pause_100)
                 binding.startStop.isEnabled = true
             }
+
             is PlayerState.Paused -> {
                 binding.startStop.setImageResource(R.drawable.ic_play_100)
                 binding.startStop.isEnabled = true
             }
+
             is PlayerState.Completed -> {
                 binding.startStop.setImageResource(R.drawable.ic_play_100)
                 binding.startStop.isEnabled = true
@@ -126,7 +145,11 @@ class AudioPlayerFragment : Fragment() {
         }
     }
 
-    private fun setupOptionalField(group: androidx.constraintlayout.widget.Group, textView: android.widget.TextView, value: String?) {
+    private fun setupOptionalField(
+        group: androidx.constraintlayout.widget.Group,
+        textView: android.widget.TextView,
+        value: String?
+    ) {
         if (value.isNullOrEmpty()) {
             group.visibility = View.GONE
         } else {

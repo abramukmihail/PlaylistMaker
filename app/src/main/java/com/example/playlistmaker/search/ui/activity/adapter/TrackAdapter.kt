@@ -26,7 +26,7 @@ class TrackAdapter(
             parent,
             false
         )
-        return TrackViewHolder(binding,parent.context)
+        return TrackViewHolder(binding, parent.context)
     }
 
     override fun onBindViewHolder(holder: TrackViewHolder, position: Int) {

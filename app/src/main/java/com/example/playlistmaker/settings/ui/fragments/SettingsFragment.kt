@@ -43,7 +43,6 @@ class SettingsFragment : Fragment() {
             userAgreement.setOnClickListener {
                 viewModel.transitionAgreement()
             }
-
             themeSwitcher.setOnCheckedChangeListener { _, checked ->
                 viewModel.toggleDarkTheme(checked)
             }
@@ -52,7 +51,12 @@ class SettingsFragment : Fragment() {
 
     private fun setupObservers() {
         viewModel.themeState.observe(viewLifecycleOwner) { isDarkTheme ->
+
+            binding.themeSwitcher.setOnCheckedChangeListener(null)
             binding.themeSwitcher.isChecked = isDarkTheme
+            binding.themeSwitcher.setOnCheckedChangeListener { _, checked ->
+                viewModel.toggleDarkTheme(checked)
+            }
         }
     }
 

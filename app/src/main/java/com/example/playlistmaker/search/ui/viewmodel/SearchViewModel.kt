@@ -60,9 +60,11 @@ class SearchViewModel(
                             _searchState.value = SearchState.Content(result.tracks)
                         }
                     }
+
                     -1 -> {
                         _searchState.value = SearchState.Error.NoConnection
                     }
+
                     else -> {
                         _searchState.value = SearchState.EmptyResult
                     }
