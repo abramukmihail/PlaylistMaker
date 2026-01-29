@@ -9,6 +9,7 @@ interface TrackRepository {
     fun addToSearchHistory(track: Track)
     fun clearSearchHistory()
 }
+
 data class SearchResult(
     val tracks: List<Track>,
     val resultCode: Int

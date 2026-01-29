@@ -52,6 +52,7 @@ class SettingsViewModel(
             sharingInteractor.transitionAgreement()
         }
     }
+
     sealed class SettingsUiState {
         data class ThemeChanged(val isDarkTheme: Boolean) : SettingsUiState()
     }

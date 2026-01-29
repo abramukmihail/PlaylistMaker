@@ -8,19 +8,13 @@
 
     <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="56dp"
         >
-
-        <Button
-            android:id="@+id/back"
-            style="@style/ButtonBack"
-            android:contentDescription="@string/title" />
 
         <TextView style="@style/TextSize22"
             android:text="@string/media_library"
-            android:layout_marginStart="@dimen/size_12dp"
-            android:layout_marginTop="14dp"
-            android:layout_toEndOf="@+id/back"/>
+            android:layout_marginStart="@dimen/size_16dp"
+            android:layout_marginTop="@dimen/size_14dp" />
     </RelativeLayout>
 
     <com.google.android.material.tabs.TabLayout
@@ -33,5 +27,6 @@
     <androidx.viewpager2.widget.ViewPager2
         android:id="@+id/viewPager"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"/>
+        android:layout_height="0dp"
+        android:layout_weight="1" />
 </LinearLayout>
