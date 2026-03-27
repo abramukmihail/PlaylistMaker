@@ -15,7 +15,7 @@ import kotlinx.coroutines.launch
 
 import com.example.playlistmaker.player.domain.repository.PlayerRepository
 
-class PlayerInteractorImpl (private val playerRepository: PlayerRepository): PlayerInteractor {
+class PlayerInteractorImpl(private val playerRepository: PlayerRepository) : PlayerInteractor {
 
     private val coroutineScope = CoroutineScope(Dispatchers.Main)
     private var progressUpdateJob: Job? = null
@@ -65,6 +65,7 @@ class PlayerInteractorImpl (private val playerRepository: PlayerRepository): Pla
         stopProgressUpdates()
         playerRepository.release()
     }
+
     companion object {
         private const val PROGRESS_UPDATE_DELAY_MS = 300L
     }

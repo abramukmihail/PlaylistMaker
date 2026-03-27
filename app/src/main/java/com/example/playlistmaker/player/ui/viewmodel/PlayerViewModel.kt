@@ -35,6 +35,7 @@ class PlayerViewModel(
             }
         }
     }
+
     fun setupTrack(track: Track) {
         viewModelScope.launch {
             playerInteractor.prepare(track.previewUrl)

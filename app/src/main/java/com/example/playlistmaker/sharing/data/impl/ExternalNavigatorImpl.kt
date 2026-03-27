@@ -30,14 +30,14 @@ class ExternalNavigatorImpl(
             putExtra(Intent.EXTRA_TEXT, emailData.message)
             flags = Intent.FLAG_ACTIVITY_NEW_TASK
         }
-            context.startActivity(emailIntent)
+        context.startActivity(emailIntent)
     }
 
     override fun openLink(emailData: EmailData) {
         val browserIntent = Intent(Intent.ACTION_VIEW, emailData.userAgreementUrl.toUri()).apply {
             flags = Intent.FLAG_ACTIVITY_NEW_TASK
         }
-            context.startActivity(browserIntent)
+        context.startActivity(browserIntent)
     }
 }
 

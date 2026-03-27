@@ -8,9 +8,9 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
 
-class PlayerRepositoryImpl (
+class PlayerRepositoryImpl(
     private val mediaPlayerProvider: () -> MediaPlayer
-): PlayerRepository {
+) : PlayerRepository {
 
     private var mediaPlayer: MediaPlayer? = null
 
@@ -59,11 +59,13 @@ class PlayerRepositoryImpl (
                 mediaPlayer?.start()
                 _playerState.update { PlayerState.Playing }
             }
+
             is PlayerState.Completed -> {
                 mediaPlayer?.seekTo(0)
                 mediaPlayer?.start()
                 _playerState.update { PlayerState.Playing }
             }
+
             else -> {}
         }
     }
