@@ -1,13 +1,13 @@
 package com.example.playlistmaker.search.domain.repository
 
-import com.example.playlistmaker.search.domain.repository.SearchResult
 import com.example.playlistmaker.search.domain.models.Track
+import kotlinx.coroutines.flow.Flow
 
 interface TrackRepository {
-    fun searchTracks(searchQuery: String): SearchResult
+    fun searchTracks(searchQuery: String): Flow<SearchResult>
     fun getSearchHistory(): List<Track>
-    fun addToSearchHistory(track: Track)
-    fun clearSearchHistory()
+    suspend fun addToSearchHistory(track: Track)
+    suspend fun clearSearchHistory()
 }
 
 data class SearchResult(

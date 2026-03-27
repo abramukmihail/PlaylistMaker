@@ -1,23 +1,20 @@
 package com.example.playlistmaker.player.domain.interactor.impl
 
-
 import com.example.playlistmaker.player.domain.interactor.PlayerInteractor
 import com.example.playlistmaker.player.domain.models.PlaybackProgress
 import com.example.playlistmaker.player.domain.models.PlayerState
+import com.example.playlistmaker.player.domain.repository.PlayerRepository
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.isActive
-import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-
-import com.example.playlistmaker.player.domain.repository.PlayerRepository
 
 class PlayerInteractorImpl(private val playerRepository: PlayerRepository) : PlayerInteractor {
 
-    private val coroutineScope = CoroutineScope(Dispatchers.Main)
+    private val scope = CoroutineScope(Dispatchers.Main)
     private var progressUpdateJob: Job? = null
 
     override val playerState: StateFlow<PlayerState> = playerRepository.playerState
@@ -45,9 +42,8 @@ class PlayerInteractorImpl(private val playerRepository: PlayerRepository) : Pla
     }
 
     private fun startProgressUpdates() {
-        stopProgressUpdates()
-
-        progressUpdateJob = coroutineScope.launch {
+        progressUpdateJob?.cancel()
+        progressUpdateJob = scope.launch {
             while (isActive) {
                 playerRepository.updateProgress()
                 delay(PROGRESS_UPDATE_DELAY_MS)
@@ -59,7 +55,6 @@ class PlayerInteractorImpl(private val playerRepository: PlayerRepository) : Pla
         progressUpdateJob?.cancel()
         progressUpdateJob = null
     }
-
 
     override fun release() {
         stopProgressUpdates()
