@@ -60,11 +60,11 @@ class TrackRepositoryImpl(
     }
 
     override suspend fun clearSearchHistory() {
-        withContext(Dispatchers.IO) {
-            sharedPreferences.edit()
+
+        sharedPreferences.edit()
                 .remove(SEARCH_HISTORY_STORAGE)
                 .apply()
-        }
+
     }
 
     companion object {

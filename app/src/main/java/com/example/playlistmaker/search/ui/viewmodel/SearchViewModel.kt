@@ -10,6 +10,7 @@ import com.example.playlistmaker.search.domain.models.Track
 import com.example.playlistmaker.utils.debounce
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 
 class SearchViewModel(
     private val trackInteractor: TrackInteractor
@@ -83,7 +84,7 @@ class SearchViewModel(
         if (isClickAllowed) {
             isClickAllowed = false
             viewModelScope.launch {
-                kotlinx.coroutines.delay(CLICK_DEBOUNCE_DELAY)
+                delay(CLICK_DEBOUNCE_DELAY)
                 isClickAllowed = true
             }
         }

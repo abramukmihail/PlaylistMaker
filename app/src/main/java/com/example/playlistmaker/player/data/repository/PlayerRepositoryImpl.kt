@@ -76,6 +76,9 @@ class PlayerRepositoryImpl(
     }
 
     override fun updateProgress() {
+        if (_playerState.value is PlayerState.Completed) {
+            return
+        }
         val currentPosition = mediaPlayer?.currentPosition ?: 0
         val duration = mediaPlayer?.duration ?: 0
 

@@ -15,8 +15,7 @@ class RetrofitNetworkClient(
             return Response().apply { resultCode = 400 }
         }
 
-        return withContext(Dispatchers.IO) {
-            try {
+        return try {
                 val response = itunesService.findTrack(dto.term)
                 response.apply { resultCode = 200 }
             } catch (e: Exception) {
@@ -24,4 +23,3 @@ class RetrofitNetworkClient(
             }
         }
     }
-}
