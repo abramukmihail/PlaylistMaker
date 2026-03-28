@@ -1,9 +1,6 @@
 package com.example.playlistmaker.search.ui.fragments
 
-import android.content.Intent
 import android.os.Bundle
-import android.os.Handler
-import android.os.Looper
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.LayoutInflater
@@ -11,12 +8,8 @@ import android.view.ViewGroup
 import android.view.View
 import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
-import androidx.activity.viewModels
-import androidx.appcompat.app.AppCompatActivity
-import androidx.core.content.ContentProviderCompat.requireContext
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import com.example.playlistmaker.databinding.FragmentSearchBinding
 import com.example.playlistmaker.search.domain.models.SearchState
@@ -38,9 +31,6 @@ class SearchFragment : Fragment() {
     private var currentEditText: String = EDITTEXT_DEF
     private lateinit var adapter: TrackAdapter
     private lateinit var historyAdapter: TrackAdapter
-    private val handler = Handler(Looper.getMainLooper())
-    private var isClickAllowed = true
-    private val searchRunnable = Runnable { performSearch(currentEditText) }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -55,19 +45,18 @@ class SearchFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         adapter = TrackAdapter(emptyList()) { track ->
-            if (clickDebounce()) {
+            if (viewModel.clickDebounce()) {
                 onTrackClick(track)
             }
         }
         historyAdapter = TrackAdapter(emptyList()) { track ->
-            if (clickDebounce()) {
+            if (viewModel.clickDebounce()) {
                 onTrackClick(track)
             }
         }
 
         setupViews()
         setupObservers()
-        loadSearchHistory()
 
         savedInstanceState?.let {
             currentEditText = it.getString(EDITTEXT_KEY, EDITTEXT_DEF)
@@ -106,19 +95,12 @@ class SearchFragment : Fragment() {
 
             refreshButton.setOnClickListener {
                 if (currentEditText.isNotEmpty()) {
-                    performSearch(currentEditText)
+                    viewModel.searchDebounced(currentEditText)
                 }
             }
 
             val searchTextWatcher = object : TextWatcher {
-                override fun beforeTextChanged(
-                    s: CharSequence?,
-                    start: Int,
-                    count: Int,
-                    after: Int
-                ) {
-                    // empty
-                }
+                override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
 
                 override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
                     clear.visibility = clearButtonVisibility(s)
@@ -129,14 +111,12 @@ class SearchFragment : Fragment() {
                         adapter.updateTracks(emptyList())
                         viewModel.loadHistory()
                     } else {
-                        searchDebounce()
+                        viewModel.searchDebounced(currentEditText)
                     }
                     updateSearchHistoryVisibility()
                 }
 
-                override fun afterTextChanged(s: Editable?) {
-                    // empty
-                }
+                override fun afterTextChanged(s: Editable?) {}
             }
 
             searchEditText.addTextChangedListener(searchTextWatcher)
@@ -168,16 +148,13 @@ class SearchFragment : Fragment() {
             is SearchState.Empty -> {
                 showSearchHistory()
             }
-
             is SearchState.Loading -> {
                 showProgressBar(true)
             }
-
             is SearchState.EmptyResult -> {
                 showProgressBar(false)
                 showNothingFound()
             }
-
             is SearchState.Content -> {
                 showProgressBar(false)
                 adapter.updateTracks(state.tracks)
@@ -185,31 +162,15 @@ class SearchFragment : Fragment() {
                 binding.noConnection.visibility = View.GONE
                 binding.recyclerView.visibility = View.VISIBLE
             }
-
             is SearchState.Error.NoConnection -> {
                 showProgressBar(false)
                 showNoConnection()
             }
-
             is SearchState.Error.NetworkError -> {
                 showProgressBar(false)
                 showNoConnection()
             }
         }
-    }
-
-    private fun searchDebounce() {
-        handler.removeCallbacks(searchRunnable)
-        handler.postDelayed(searchRunnable, SEARCH_DEBOUNCE_DELAY)
-    }
-
-    private fun clickDebounce(): Boolean {
-        val current = isClickAllowed
-        if (isClickAllowed) {
-            isClickAllowed = false
-            handler.postDelayed({ isClickAllowed = true }, CLICK_DEBOUNCE_DELAY)
-        }
-        return current
     }
 
     private fun onTrackClick(track: Track) {
@@ -235,10 +196,6 @@ class SearchFragment : Fragment() {
         }
     }
 
-    private fun loadSearchHistory() {
-        viewModel.loadHistory()
-    }
-
     private fun showSearchHistory() {
         with(binding) {
             searchHistory.visibility = View.VISIBLE
@@ -250,19 +207,7 @@ class SearchFragment : Fragment() {
     }
 
     private fun clearButtonVisibility(s: CharSequence?): Int {
-        return if (s.isNullOrEmpty()) {
-            View.GONE
-        } else {
-            View.VISIBLE
-        }
-    }
-
-    private fun performSearch(query: String) {
-        if (query.isBlank()) return
-
-        clearErrors()
-        showProgressBar(true)
-        viewModel.searchDebounced(query)
+        return if (s.isNullOrEmpty()) View.GONE else View.VISIBLE
     }
 
     private fun showProgressBar(show: Boolean) {
@@ -304,8 +249,7 @@ class SearchFragment : Fragment() {
         inputMethodManager?.showSoftInput(editText, InputMethodManager.SHOW_IMPLICIT)
     }
 
-
-    private fun hideKeyboard(editText: android.widget.EditText) {
+    private fun hideKeyboard(editText: EditText) {
         val inputMethodManager = ContextCompat.getSystemService(
             requireContext(),
             InputMethodManager::class.java
@@ -321,15 +265,11 @@ class SearchFragment : Fragment() {
 
     override fun onDestroyView() {
         super.onDestroyView()
-        handler.removeCallbacks(searchRunnable)
         _binding = null
     }
 
     companion object {
         private const val EDITTEXT_KEY = "EDITTEXT_KEY"
         private const val EDITTEXT_DEF = ""
-        private const val SEARCH_DEBOUNCE_DELAY = 2000L
-        private const val CLICK_DEBOUNCE_DELAY = 1000L
     }
-
 }
