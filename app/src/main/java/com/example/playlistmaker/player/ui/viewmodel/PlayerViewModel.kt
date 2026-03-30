@@ -40,8 +40,10 @@ class PlayerViewModel(
     }
 
     fun setupTrack(track: Track) {
-        _isFavorite.value = track.isFavorite
         viewModelScope.launch {
+            val isFavorite = favoriteInteractor.isFavorite(track.trackId)
+            track.isFavorite = isFavorite
+            _isFavorite.value = isFavorite
             playerInteractor.prepare(track.previewUrl)
         }
     }

@@ -8,4 +8,5 @@ interface FavoriteRepository {
     suspend fun addTrackToFavorites(track: Track)
     suspend fun removeTrackFromFavorites(track: Track)
     suspend fun getFavoriteTrackIds(): List<Int>
+    suspend fun isFavorite(trackId: Int): Boolean
 }

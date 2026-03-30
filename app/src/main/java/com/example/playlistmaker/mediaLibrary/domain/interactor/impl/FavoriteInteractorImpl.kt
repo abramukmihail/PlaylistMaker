@@ -20,4 +20,8 @@ class FavoriteInteractorImpl(
     override suspend fun removeTrackFromFavorites(track: Track) {
         favoriteRepository.removeTrackFromFavorites(track)
     }
+
+    override suspend fun isFavorite(trackId: Int): Boolean {
+        return favoriteRepository.isFavorite(trackId)
+    }
 }

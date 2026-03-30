@@ -6,6 +6,7 @@ import androidx.room.Room
 import com.example.playlistmaker.player.data.repository.PlayerRepositoryImpl
 import android.content.SharedPreferences
 import com.example.playlistmaker.mediaLibrary.data.db.AppDatabase
+import com.example.playlistmaker.mediaLibrary.data.db.dao.FavoriteTrackDao
 import com.example.playlistmaker.mediaLibrary.data.repository.FavoriteRepositoryImpl
 import com.example.playlistmaker.mediaLibrary.domain.repository.FavoriteRepository
 import com.example.playlistmaker.player.domain.repository.PlayerRepository
@@ -52,7 +53,12 @@ val dataModule = module {
 
     single {
         Room.databaseBuilder(androidContext(), AppDatabase::class.java, "database.db")
+            .fallbackToDestructiveMigration()
             .build()
+    }
+
+    single<FavoriteTrackDao> {
+        get<AppDatabase>().favoriteTrackDao()
     }
 
     single<FavoriteRepository> {

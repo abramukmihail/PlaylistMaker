@@ -22,4 +22,7 @@ interface FavoriteTrackDao {
 
     @Query("SELECT trackId FROM favorite_track_table")
     suspend fun getFavoriteTrackIds(): List<Int>
+
+    @Query("SELECT EXISTS(SELECT 1 FROM favorite_track_table WHERE trackId = :trackId)")
+    suspend fun isFavorite(trackId: Int): Boolean
 }
