@@ -6,8 +6,6 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
-import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.lifecycleScope
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import com.example.playlistmaker.R
@@ -18,7 +16,6 @@ import com.example.playlistmaker.player.ui.viewmodel.PlayerViewModel
 import com.example.playlistmaker.search.domain.models.Track
 import java.text.SimpleDateFormat
 import java.util.Locale
-import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class AudioPlayerFragment : Fragment() {
@@ -40,19 +37,22 @@ class AudioPlayerFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        val track = arguments?.getParcelable<Track>(TRACK_EXTRA)
 
-
-        setupClickListeners()
+        setupClickListeners(track)
         setupObservers()
-        showTrack()
+        showTrack(track)
     }
 
-    private fun setupClickListeners() {
+    private fun setupClickListeners(track: Track?) {
         binding.back.setOnClickListener {
             findNavController().popBackStack()
         }
         binding.startStop.setOnClickListener {
             viewModel.togglePlayback()
+        }
+        binding.toFavourites.setOnClickListener {
+            track?.let { viewModel.onFavoriteClicked(it) }
         }
     }
 
@@ -64,16 +64,19 @@ class AudioPlayerFragment : Fragment() {
         viewModel.playbackProgress.observe(viewLifecycleOwner) { progress ->
             updatePlaybackProgress(progress)
         }
+
+        viewModel.isFavorite.observe(viewLifecycleOwner) { isFavorite ->
+            val iconRes = if (isFavorite) R.drawable.ic_add_to_favourites_51 else R.drawable.ic_favourite_filled
+            binding.toFavourites.setImageResource(iconRes)
+        }
     }
 
-    private fun showTrack() {
-        val track = arguments?.getParcelable<Track>(TRACK_EXTRA)
-
+    private fun showTrack(track: Track?) {
         if (track != null) {
             binding.trackName.text = track.trackName
             binding.artistName.text = track.artistName
             binding.trackTime2.text = SimpleDateFormat("mm:ss", Locale.getDefault())
-                .format(track.trackTimeMillis.toLong())
+                .format(track.trackTimeMillis.toLongOrNull() ?: 0L)
 
             setupOptionalField(
                 binding.collectionNameGroup,
@@ -83,7 +86,7 @@ class AudioPlayerFragment : Fragment() {
             setupOptionalField(
                 binding.releaseDateGroup,
                 binding.releaseDate2,
-                track.releaseDate?.substring(0, 4)
+                track.releaseDate?.take(4)
             )
             setupOptionalField(
                 binding.primaryGenreNameGroup,
@@ -99,22 +102,12 @@ class AudioPlayerFragment : Fragment() {
 
     private fun updatePlayerState(state: PlayerState) {
         when (state) {
-            is PlayerState.Default -> {
+            is PlayerState.Default, is PlayerState.Idle, is PlayerState.Preparing -> {
                 binding.startStop.setImageResource(R.drawable.ic_play_100)
                 binding.startStop.isEnabled = false
             }
 
-            is PlayerState.Idle -> {
-                binding.startStop.setImageResource(R.drawable.ic_play_100)
-                binding.startStop.isEnabled = false
-            }
-
-            is PlayerState.Preparing -> {
-                binding.startStop.setImageResource(R.drawable.ic_play_100)
-                binding.startStop.isEnabled = false
-            }
-
-            is PlayerState.Prepared -> {
+            is PlayerState.Prepared, is PlayerState.Paused, is PlayerState.Completed -> {
                 binding.startStop.setImageResource(R.drawable.ic_play_100)
                 binding.startStop.isEnabled = true
             }
@@ -123,26 +116,11 @@ class AudioPlayerFragment : Fragment() {
                 binding.startStop.setImageResource(R.drawable.ic_pause_100)
                 binding.startStop.isEnabled = true
             }
-
-            is PlayerState.Paused -> {
-                binding.startStop.setImageResource(R.drawable.ic_play_100)
-                binding.startStop.isEnabled = true
-            }
-
-            is PlayerState.Completed -> {
-                binding.startStop.setImageResource(R.drawable.ic_play_100)
-                binding.startStop.isEnabled = true
-            }
-
         }
     }
 
     private fun updatePlaybackProgress(progress: PlaybackProgress?) {
-        progress?.let {
-            binding.remainingTime.text = it.formattedCurrent
-        } ?: run {
-            binding.remainingTime.text = TIME_0
-        }
+        binding.remainingTime.text = progress?.formattedCurrent ?: TIME_0
     }
 
     private fun setupOptionalField(
@@ -170,12 +148,8 @@ class AudioPlayerFragment : Fragment() {
 
     override fun onPause() {
         super.onPause()
-        if (isRemoving) return
-
-        viewModel.playerState.value?.let { state ->
-            if (state is PlayerState.Playing) {
-                viewModel.togglePlayback()
-            }
+        if (viewModel.playerState.value is PlayerState.Playing) {
+            viewModel.togglePlayback()
         }
     }
 
@@ -187,14 +161,5 @@ class AudioPlayerFragment : Fragment() {
     companion object {
         private const val TIME_0 = "00:00"
         const val TRACK_EXTRA = "track_extra"
-
-        fun newInstance(track: Track): AudioPlayerFragment {
-            return AudioPlayerFragment().apply {
-                arguments = Bundle().apply {
-                    putParcelable(TRACK_EXTRA, track)
-                }
-            }
-        }
     }
-
 }

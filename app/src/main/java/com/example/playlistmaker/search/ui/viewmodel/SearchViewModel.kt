@@ -37,10 +37,14 @@ class SearchViewModel(
 
     fun searchDebounced(query: String) {
         if (query.isEmpty()) {
+            latestSearchText = ""
+            trackSearchDebounce("")
+            currentSearchJob?.cancel()
             _searchState.value = SearchState.Empty
             loadHistory()
             return
         }
+        
         if (latestSearchText == query) return
 
         latestSearchText = query
@@ -48,10 +52,12 @@ class SearchViewModel(
     }
 
     private fun performSearch(query: String) {
+        if (query.isEmpty()) return
+        
         currentSearchJob?.cancel()
         _searchState.value = SearchState.Loading
 
-        viewModelScope.launch {
+        currentSearchJob = viewModelScope.launch {
             trackInteractor
                 .searchTracks(query)
                 .collect { result ->
@@ -64,14 +70,11 @@ class SearchViewModel(
                                     _searchState.value = SearchState.Content(result.tracks)
                                 }
                             }
-
                             -1 -> {
                                 _searchState.value = SearchState.Error.NoConnection
                             }
-
                             else -> {
-                                _searchState.value =
-                                    SearchState.Error.NetworkError("Error ${result.resultCode}")
+                                _searchState.value = SearchState.Error.NetworkError("Error ${result.resultCode}")
                             }
                         }
                     }
@@ -107,19 +110,22 @@ class SearchViewModel(
 
     fun loadHistory() {
         viewModelScope.launch {
-            _historyState.value = trackInteractor.getSearchHistory()
+            trackInteractor.getSearchHistory().collect { history ->
+                _historyState.postValue(history)
+            }
         }
     }
 
     fun cancelSearch() {
+        latestSearchText = ""
+        trackSearchDebounce("")
         currentSearchJob?.cancel()
         currentSearchJob = null
-        latestSearchText = null
         _searchState.value = SearchState.Empty
     }
 
     companion object {
         private const val SEARCH_DEBOUNCE_DELAY = 2000L
-        private const val CLICK_DEBOUNCE_DELAY = 500L
+        private const val CLICK_DEBOUNCE_DELAY = 1000L
     }
 }

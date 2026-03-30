@@ -2,8 +2,12 @@ package com.example.playlistmaker.di
 
 import android.content.Context
 import android.media.MediaPlayer
+import androidx.room.Room
 import com.example.playlistmaker.player.data.repository.PlayerRepositoryImpl
 import android.content.SharedPreferences
+import com.example.playlistmaker.mediaLibrary.data.db.AppDatabase
+import com.example.playlistmaker.mediaLibrary.data.repository.FavoriteRepositoryImpl
+import com.example.playlistmaker.mediaLibrary.domain.repository.FavoriteRepository
 import com.example.playlistmaker.player.domain.repository.PlayerRepository
 import com.example.playlistmaker.search.data.network.ItunesApi
 import com.example.playlistmaker.search.data.network.NetworkClient
@@ -14,7 +18,6 @@ import com.google.gson.Gson
 import org.koin.android.ext.koin.androidContext
 import org.koin.dsl.module
 import retrofit2.Retrofit
-import com.example.playlistmaker.sharing.data.provider.SharingConfigProvider
 import retrofit2.converter.gson.GsonConverterFactory
 import org.koin.core.qualifier.named
 
@@ -47,11 +50,21 @@ val dataModule = module {
 
     factory { Gson() }
 
+    single {
+        Room.databaseBuilder(androidContext(), AppDatabase::class.java, "database.db")
+            .build()
+    }
+
+    single<FavoriteRepository> {
+        FavoriteRepositoryImpl(get())
+    }
+
     single<TrackRepositoryImpl> {
         TrackRepositoryImpl(
             networkClient = get(),
             sharedPreferences = get(),
-            gson = get()
+            gson = get(),
+            favoriteRepository = get()
         )
     }
 

@@ -14,7 +14,7 @@ class TrackInteractorImpl(
         return trackRepository.searchTracks(query)
     }
 
-    override fun getSearchHistory(): List<Track> {
+    override fun getSearchHistory(): Flow<List<Track>> {
         return trackRepository.getSearchHistory()
     }
 
