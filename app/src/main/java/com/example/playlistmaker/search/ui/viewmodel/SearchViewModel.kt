@@ -7,10 +7,10 @@ import androidx.lifecycle.viewModelScope
 import com.example.playlistmaker.search.domain.interactor.TrackInteractor
 import com.example.playlistmaker.search.domain.models.SearchState
 import com.example.playlistmaker.search.domain.models.Track
+import com.example.playlistmaker.utils.debounce
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
-import kotlin.text.isEmpty
 
 class SearchViewModel(
     private val trackInteractor: TrackInteractor
@@ -22,59 +22,73 @@ class SearchViewModel(
     private val _historyState = MutableLiveData<List<Track>>(emptyList())
     val historyState: LiveData<List<Track>> = _historyState
 
-    private var searchJob: Job? = null
-    private var debounceJob: Job? = null
-    private val searchDebounceDelay = 2000L
+    private var latestSearchText: String? = null
+    private var currentSearchJob: Job? = null
+
+    private val trackSearchDebounce = debounce<String>(SEARCH_DEBOUNCE_DELAY, viewModelScope, true) { changedText ->
+        performSearch(changedText)
+    }
+
+    private var isClickAllowed = true
 
     init {
         loadHistory()
     }
 
     fun searchDebounced(query: String) {
-        debounceJob?.cancel()
-
         if (query.isEmpty()) {
             _searchState.value = SearchState.Empty
             loadHistory()
             return
         }
+        if (latestSearchText == query) return
 
-        _searchState.value = SearchState.Loading
-        debounceJob = viewModelScope.launch {
-            delay(searchDebounceDelay)
-            performSearch(query)
-        }
+        latestSearchText = query
+        trackSearchDebounce(query)
     }
 
     private fun performSearch(query: String) {
-        searchJob?.cancel()
-        searchJob = viewModelScope.launch {
-            try {
-                val result = trackInteractor.searchTracks(query)
+        currentSearchJob?.cancel()
+        _searchState.value = SearchState.Loading
 
-                when (result.resultCode) {
-                    200 -> {
-                        if (result.tracks.isEmpty()) {
-                            _searchState.value = SearchState.EmptyResult
-                        } else {
-                            _searchState.value = SearchState.Content(result.tracks)
+        viewModelScope.launch {
+            trackInteractor
+                .searchTracks(query)
+                .collect { result ->
+                    if (latestSearchText == query) {
+                        when (result.resultCode) {
+                            200 -> {
+                                if (result.tracks.isEmpty()) {
+                                    _searchState.value = SearchState.EmptyResult
+                                } else {
+                                    _searchState.value = SearchState.Content(result.tracks)
+                                }
+                            }
+
+                            -1 -> {
+                                _searchState.value = SearchState.Error.NoConnection
+                            }
+
+                            else -> {
+                                _searchState.value =
+                                    SearchState.Error.NetworkError("Error ${result.resultCode}")
+                            }
                         }
                     }
-
-                    -1 -> {
-                        _searchState.value = SearchState.Error.NoConnection
-                    }
-
-                    else -> {
-                        _searchState.value = SearchState.EmptyResult
-                    }
                 }
-            } catch (e: Exception) {
-                _searchState.value = SearchState.Error.NetworkError(
-                    e.message ?: "Unknown error"
-                )
+        }
+    }
+
+    fun clickDebounce(): Boolean {
+        val current = isClickAllowed
+        if (isClickAllowed) {
+            isClickAllowed = false
+            viewModelScope.launch {
+                delay(CLICK_DEBOUNCE_DELAY)
+                isClickAllowed = true
             }
         }
+        return current
     }
 
     fun addToSearchHistory(track: Track) {
@@ -98,8 +112,14 @@ class SearchViewModel(
     }
 
     fun cancelSearch() {
-        searchJob?.cancel()
-        debounceJob?.cancel()
+        currentSearchJob?.cancel()
+        currentSearchJob = null
+        latestSearchText = null
         _searchState.value = SearchState.Empty
+    }
+
+    companion object {
+        private const val SEARCH_DEBOUNCE_DELAY = 2000L
+        private const val CLICK_DEBOUNCE_DELAY = 500L
     }
 }

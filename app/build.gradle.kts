@@ -58,6 +58,7 @@ dependencies {
     implementation(libs.gson)
     implementation (libs.material.v1130)
     implementation (libs.glide)
+    implementation(libs.kotlinx.coroutines.android)
     annotationProcessor ("com.github.bumptech.glide:compiler:5.0.5")
     implementation("com.squareup.retrofit2:retrofit:2.9.0")
     implementation("com.squareup.retrofit2:converter-gson:2.9.0")
