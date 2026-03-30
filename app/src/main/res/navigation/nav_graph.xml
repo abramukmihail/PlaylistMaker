@@ -23,6 +23,9 @@
         android:name="com.example.playlistmaker.mediaLibrary.ui.fragments.MediaLibraryFragment"
         android:label="@string/media_library"
         tools:layout="@layout/fragment_media_library">
+        <action
+            android:id="@+id/action_mediaLibraryFragment_to_audioPlayerFragment"
+            app:destination="@id/audioPlayerFragment" />
     </fragment>
 
     <fragment

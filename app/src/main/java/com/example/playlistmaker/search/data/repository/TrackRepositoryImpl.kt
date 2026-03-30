@@ -1,6 +1,7 @@
 package com.example.playlistmaker.search.data.repository
 
 import android.content.SharedPreferences
+import com.example.playlistmaker.mediaLibrary.domain.repository.FavoriteRepository
 import com.example.playlistmaker.search.data.mapper.HistoryMapper
 import com.example.playlistmaker.search.data.mapper.TrackMapper
 import com.example.playlistmaker.search.data.network.NetworkClient
@@ -18,7 +19,8 @@ import kotlinx.coroutines.withContext
 class TrackRepositoryImpl(
     private val networkClient: NetworkClient,
     private val sharedPreferences: SharedPreferences,
-    private val gson: Gson
+    private val gson: Gson,
+    private val favoriteRepository: FavoriteRepository
 ) : TrackRepository {
 
     override fun searchTracks(searchQuery: String): Flow<SearchResult> = flow {
@@ -37,14 +39,16 @@ class TrackRepositoryImpl(
         }
     }
 
-    override fun getSearchHistory(): List<Track> {
+    override fun getSearchHistory(): Flow<List<Track>> = flow {
         val json = sharedPreferences.getString(SEARCH_HISTORY_STORAGE, null)
-        return HistoryMapper.fromJson(json, gson)
+        val history = HistoryMapper.fromJson(json, gson)
+        emit(history)
     }
 
     override suspend fun addToSearchHistory(track: Track) {
         withContext(Dispatchers.IO) {
-            val historyList = getSearchHistory().toMutableList()
+            val json = sharedPreferences.getString(SEARCH_HISTORY_STORAGE, null)
+            val historyList = HistoryMapper.fromJson(json, gson).toMutableList()
 
             historyList.removeIf { it.trackId == track.trackId }
             historyList.add(0, track)
@@ -60,11 +64,9 @@ class TrackRepositoryImpl(
     }
 
     override suspend fun clearSearchHistory() {
-
         sharedPreferences.edit()
                 .remove(SEARCH_HISTORY_STORAGE)
                 .apply()
-
     }
 
     companion object {
