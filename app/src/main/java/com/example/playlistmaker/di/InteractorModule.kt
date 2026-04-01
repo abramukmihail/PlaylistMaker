@@ -1,7 +1,9 @@
 package com.example.playlistmaker.di
 
 import com.example.playlistmaker.mediaLibrary.domain.interactor.FavoriteInteractor
+import com.example.playlistmaker.mediaLibrary.domain.interactor.PlaylistInteractor
 import com.example.playlistmaker.mediaLibrary.domain.interactor.impl.FavoriteInteractorImpl
+import com.example.playlistmaker.mediaLibrary.domain.interactor.impl.PlaylistInteractorImpl
 import com.example.playlistmaker.player.domain.interactor.PlayerInteractor
 import com.example.playlistmaker.player.domain.interactor.impl.PlayerInteractorImpl
 import com.example.playlistmaker.search.domain.interactor.TrackInteractor
@@ -26,5 +28,9 @@ val interactorModule = module {
 
     single<FavoriteInteractor> {
         FavoriteInteractorImpl(get())
+    }
+
+    single<PlaylistInteractor> {
+        PlaylistInteractorImpl(get())
     }
 }

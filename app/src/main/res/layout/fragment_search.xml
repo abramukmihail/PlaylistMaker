@@ -47,7 +47,7 @@
             android:textColor="@color/black"
             android:textColorHint="@color/text_color_search"
             android:textFontWeight="400"
-            android:textSize="@dimen/text_size_settings"
+            android:textSize="@dimen/text_size_16sp"
             android:theme="@style/BlueCursorTheme"
             tools:ignore="Autofill,DuplicateSpeakableTextCheck,RtlSymmetry,TouchTargetSizeCheck,VisualLintTextFieldSize,TextContrastCheck" />
 

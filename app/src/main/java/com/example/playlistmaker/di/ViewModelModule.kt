@@ -6,6 +6,7 @@ import com.example.playlistmaker.settings.ui.viewmodel.SettingsViewModel
 import org.koin.androidx.viewmodel.dsl.viewModel
 import com.example.playlistmaker.mediaLibrary.ui.viewmodel.FavoritesViewModel
 import com.example.playlistmaker.mediaLibrary.ui.viewmodel.PlaylistsViewModel
+import com.example.playlistmaker.mediaLibrary.ui.viewmodel.NewPlaylistViewModel
 import org.koin.dsl.module
 
 val viewModelModule = module {
@@ -14,9 +15,17 @@ val viewModelModule = module {
 
     viewModel { SettingsViewModel(get(), get()) }
 
-    viewModel { PlayerViewModel(get(), favoriteInteractor = get()) }
+    viewModel {
+        PlayerViewModel(
+            playerInteractor = get(),
+            favoriteInteractor = get(),
+            playlistInteractor = get()
+        )
+    }
 
-    viewModel { PlaylistsViewModel() }
+    viewModel { PlaylistsViewModel(get()) }
 
-    viewModel { FavoritesViewModel(favoriteInteractor = get()) }
+    viewModel { NewPlaylistViewModel(get()) }
+
+    viewModel { FavoritesViewModel(get()) }
 }

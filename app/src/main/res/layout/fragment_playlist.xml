@@ -1,23 +1,35 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
+    android:layout_height="match_parent"
     android:orientation="vertical"
-    android:background="@color/background">
+    android:background="@color/background"
+    android:paddingHorizontal="12dp">
 
     <com.google.android.material.button.MaterialButton
         style="@style/NewPlaylistButton"
         android:id="@+id/buttonNewPlaylist"
         android:layout_gravity="center_horizontal"
         android:layout_marginTop="@dimen/size_24dp"
-        android:layout_marginBottom="46dp"
         android:text="@string/new_playlist" />
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1">
+        <LinearLayout
+            android:id="@+id/emptyStateLayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_marginTop="46dp"
+            android:visibility="gone"
+            android:layout_gravity="center_horizontal">
 
     <ImageView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
+        android:contentDescription="@string/art"
         android:src="@drawable/ic_not_found_120" />
 
     <TextView style="@style/Text_19sp"
@@ -27,4 +39,14 @@
         android:gravity="center_horizontal"
         android:textFontWeight="500"
         android:text="@string/no_playlist" />
+        </LinearLayout>
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/playlistsRecyclerView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:visibility="gone"
+            android:clipToPadding="false"
+            android:paddingBottom="16dp" />
+
+    </FrameLayout>
 </LinearLayout>

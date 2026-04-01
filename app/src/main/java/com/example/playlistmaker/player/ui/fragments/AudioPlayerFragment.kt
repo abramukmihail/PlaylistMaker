@@ -4,16 +4,22 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.LinearLayout
+import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import com.example.playlistmaker.R
 import com.example.playlistmaker.databinding.FragmentAudioPlayerBinding
+import com.example.playlistmaker.mediaLibrary.ui.adapter.PlaylistSmallAdapter
 import com.example.playlistmaker.player.domain.models.PlaybackProgress
 import com.example.playlistmaker.player.domain.models.PlayerState
 import com.example.playlistmaker.player.ui.viewmodel.PlayerViewModel
 import com.example.playlistmaker.search.domain.models.Track
+import com.example.playlistmaker.utils.CustomSnackbar
+import com.google.android.material.bottomsheet.BottomSheetBehavior
 import java.text.SimpleDateFormat
 import java.util.Locale
 import org.koin.androidx.viewmodel.ext.android.viewModel
@@ -24,6 +30,9 @@ class AudioPlayerFragment : Fragment() {
     private val binding get() = _binding!!
 
     private val viewModel: PlayerViewModel by viewModel()
+
+    private lateinit var bottomSheetBehavior: BottomSheetBehavior<LinearLayout>
+    private lateinit var playlistAdapter: PlaylistSmallAdapter
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -37,26 +46,149 @@ class AudioPlayerFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        val track = arguments?.getParcelable<Track>(TRACK_EXTRA)
+        val track = if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.TIRAMISU) {
+            arguments?.getParcelable(TRACK_EXTRA, Track::class.java)
+        } else {
+            @Suppress("DEPRECATION")
+            arguments?.getParcelable(TRACK_EXTRA)
+        }
 
-        setupClickListeners(track)
-        setupObservers()
-        showTrack(track)
+        if (track != null) {
+            displayTrackInfo(track)
+            setupClickListeners(track)
+            setupBottomSheet()
+            observeViewModel()
+            viewModel.setupTrack(track)
+        } else {
+            findNavController().popBackStack()
+        }
     }
 
-    private fun setupClickListeners(track: Track?) {
+    private fun displayTrackInfo(track: Track) {
+        with(binding) {
+            trackName.text = track.trackName
+            artistName.text = track.artistName
+
+            val durationMillis = try {
+                track.trackTimeMillis.toIntOrNull() ?: 0
+            } catch (e: NumberFormatException) {
+                0
+            }
+            trackTime2.text = SimpleDateFormat("mm:ss", Locale.getDefault()).format(durationMillis)
+
+            Glide.with(requireContext())
+                .load(track.getCoverArtwork())
+                .centerCrop()
+                .placeholder(R.drawable.ic_placeholder_312)
+                .error(R.drawable.ic_placeholder_312)
+                .transform(RoundedCorners(resources.getDimensionPixelSize(R.dimen.cover_radius)))
+                .into(cover)
+
+            collectionNameGroup.isVisible = !track.collectionName.isNullOrEmpty()
+            if (collectionNameGroup.isVisible) {
+                collectionName2.text = track.collectionName
+            }
+
+            releaseDateGroup.isVisible = !track.releaseDate.isNullOrEmpty()
+            if (releaseDateGroup.isVisible) {
+                releaseDate2.text = track.releaseDate?.take(4)
+            }
+
+            primaryGenreNameGroup.isVisible = !track.primaryGenreName.isNullOrEmpty()
+            if (primaryGenreNameGroup.isVisible) {
+                primaryGenreName2.text = track.primaryGenreName
+            }
+
+            countryGroup.isVisible = !track.country.isNullOrEmpty()
+            if (countryGroup.isVisible) {
+                country2.text = track.country
+            }
+        }
+    }
+
+    private fun setupClickListeners(track: Track) {
         binding.back.setOnClickListener {
             findNavController().popBackStack()
         }
+
         binding.startStop.setOnClickListener {
             viewModel.togglePlayback()
         }
+
         binding.toFavourites.setOnClickListener {
-            track?.let { viewModel.onFavoriteClicked(it) }
+            viewModel.onFavoriteClicked(track)
+        }
+
+        binding.toPlaylist.setOnClickListener {
+            showPlaylistBottomSheet()
         }
     }
 
-    private fun setupObservers() {
+    private fun setupBottomSheet() {
+        val bottomSheet = binding.playlistsBottomSheet.root
+
+        val density = resources.displayMetrics.density
+        val peekHeightInPx = (505 * density).toInt()
+
+        bottomSheetBehavior = BottomSheetBehavior.from(bottomSheet).apply {
+            state = BottomSheetBehavior.STATE_HIDDEN
+            isHideable = true
+            isDraggable = true
+            peekHeight = peekHeightInPx
+        }
+
+        bottomSheetBehavior.addBottomSheetCallback(object : BottomSheetBehavior.BottomSheetCallback() {
+            override fun onStateChanged(bottomSheet: View, newState: Int) {
+                if (!isAdded || _binding == null) return
+
+                when (newState) {
+                    BottomSheetBehavior.STATE_HIDDEN -> {
+                        binding.overlay.visibility = View.GONE
+                        binding.playlistsBottomSheet.root.visibility = View.GONE
+                    }
+                    else -> {
+                        binding.overlay.visibility = View.VISIBLE
+                        binding.playlistsBottomSheet.root.visibility = View.VISIBLE
+                    }
+                }
+            }
+
+            override fun onSlide(bottomSheet: View, slideOffset: Float) {
+
+            }
+        })
+
+        playlistAdapter = PlaylistSmallAdapter { playlist ->
+            viewModel.addTrackToPlaylist(playlist)
+        }
+
+        binding.playlistsBottomSheet.playlistsRecyclerView.apply {
+            adapter = playlistAdapter
+            layoutManager = LinearLayoutManager(requireContext())
+        }
+
+        binding.playlistsBottomSheet.btnNewPlaylist.setOnClickListener {
+            bottomSheetBehavior.state = BottomSheetBehavior.STATE_HIDDEN
+            findNavController().navigate(R.id.action_audioPlayerFragment_to_newPlaylistFragment)
+        }
+
+        binding.overlay.setOnClickListener {
+            bottomSheetBehavior.state = BottomSheetBehavior.STATE_HIDDEN
+        }
+
+        binding.playlistsBottomSheet.root.visibility = View.GONE
+        binding.overlay.visibility = View.GONE
+    }
+
+    private fun showPlaylistBottomSheet() {
+        viewModel.loadPlaylists()
+        binding.playlistsBottomSheet.root.visibility = View.VISIBLE
+        binding.overlay.visibility = View.VISIBLE
+        binding.overlay.alpha = 1f
+        bottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
+    }
+
+    private fun observeViewModel() {
         viewModel.playerState.observe(viewLifecycleOwner) { state ->
             updatePlayerState(state)
         }
@@ -69,34 +201,26 @@ class AudioPlayerFragment : Fragment() {
             val iconRes = if (isFavorite) R.drawable.ic_add_to_favourites_51 else R.drawable.ic_favourite_filled
             binding.toFavourites.setImageResource(iconRes)
         }
-    }
 
-    private fun showTrack(track: Track?) {
-        if (track != null) {
-            binding.trackName.text = track.trackName
-            binding.artistName.text = track.artistName
-            binding.trackTime2.text = SimpleDateFormat("mm:ss", Locale.getDefault())
-                .format(track.trackTimeMillis.toLongOrNull() ?: 0L)
+        viewModel.playlists.observe(viewLifecycleOwner) { playlists ->
+            playlistAdapter.updatePlaylists(playlists)
+        }
 
-            setupOptionalField(
-                binding.collectionNameGroup,
-                binding.collectionName2,
-                track.collectionName
-            )
-            setupOptionalField(
-                binding.releaseDateGroup,
-                binding.releaseDate2,
-                track.releaseDate?.take(4)
-            )
-            setupOptionalField(
-                binding.primaryGenreNameGroup,
-                binding.primaryGenreName2,
-                track.primaryGenreName
-            )
-            setupOptionalField(binding.countryGroup, binding.country2, track.country)
+        viewModel.addToPlaylistStatus.observe(viewLifecycleOwner) { status ->
+            status?.let { (success, playlistName) ->
+                val message = if (success) {
+                    getString(R.string.track_added_to_playlist, playlistName)
+                } else {
+                    getString(R.string.track_already_in_playlist, playlistName)
+                }
+                CustomSnackbar.show(binding.root, message)
+                viewModel.resetAddToPlaylistStatus()
 
-            loadArtwork(track)
-            viewModel.setupTrack(track)
+                if (success) {
+                    bottomSheetBehavior.state = BottomSheetBehavior.STATE_HIDDEN
+                    viewModel.loadPlaylists()
+                }
+            }
         }
     }
 
@@ -120,30 +244,7 @@ class AudioPlayerFragment : Fragment() {
     }
 
     private fun updatePlaybackProgress(progress: PlaybackProgress?) {
-        binding.remainingTime.text = progress?.formattedCurrent ?: TIME_0
-    }
-
-    private fun setupOptionalField(
-        group: androidx.constraintlayout.widget.Group,
-        textView: android.widget.TextView,
-        value: String?
-    ) {
-        if (value.isNullOrEmpty()) {
-            group.visibility = View.GONE
-        } else {
-            textView.text = value
-            group.visibility = View.VISIBLE
-        }
-    }
-
-    private fun loadArtwork(track: Track) {
-        Glide.with(this)
-            .load(track.getCoverArtwork())
-            .centerCrop()
-            .placeholder(R.drawable.ic_placeholder_312)
-            .error(R.drawable.ic_placeholder_312)
-            .transform(RoundedCorners(resources.getDimensionPixelSize(R.dimen.cover_radius)))
-            .into(binding.cover)
+        binding.remainingTime.text = progress?.formattedCurrent ?: "00:00"
     }
 
     override fun onPause() {
@@ -159,7 +260,6 @@ class AudioPlayerFragment : Fragment() {
     }
 
     companion object {
-        private const val TIME_0 = "00:00"
         const val TRACK_EXTRA = "track_extra"
     }
 }
