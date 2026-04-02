@@ -7,8 +7,13 @@ import com.example.playlistmaker.player.data.repository.PlayerRepositoryImpl
 import android.content.SharedPreferences
 import com.example.playlistmaker.mediaLibrary.data.db.AppDatabase
 import com.example.playlistmaker.mediaLibrary.data.db.dao.FavoriteTrackDao
+import com.example.playlistmaker.mediaLibrary.data.db.dao.PlaylistDao
+import com.example.playlistmaker.mediaLibrary.data.db.dao.PlaylistTrackDao
+import com.example.playlistmaker.mediaLibrary.data.db.dao.TrackDao
 import com.example.playlistmaker.mediaLibrary.data.repository.FavoriteRepositoryImpl
+import com.example.playlistmaker.mediaLibrary.data.repository.PlaylistRepositoryImpl
 import com.example.playlistmaker.mediaLibrary.domain.repository.FavoriteRepository
+import com.example.playlistmaker.mediaLibrary.domain.repository.PlaylistRepository
 import com.example.playlistmaker.player.domain.repository.PlayerRepository
 import com.example.playlistmaker.search.data.network.ItunesApi
 import com.example.playlistmaker.search.data.network.NetworkClient
@@ -52,7 +57,7 @@ val dataModule = module {
     factory { Gson() }
 
     single {
-        Room.databaseBuilder(androidContext(), AppDatabase::class.java, "database.db")
+        Room.databaseBuilder(androidContext(), AppDatabase::class.java, AppDatabase.DATABASE_NAME)
             .fallbackToDestructiveMigration()
             .build()
     }
@@ -61,8 +66,27 @@ val dataModule = module {
         get<AppDatabase>().favoriteTrackDao()
     }
 
+    single<PlaylistDao> {
+        get<AppDatabase>().playlistDao()
+    }
+
+    single<PlaylistTrackDao> {
+        get<AppDatabase>().playlistTrackDao()
+    }
+
+    single<TrackDao> {
+        get<AppDatabase>().trackDao()
+    }
+
     single<FavoriteRepository> {
-        FavoriteRepositoryImpl(get())
+        FavoriteRepositoryImpl(
+        favoriteTrackDao = get(),
+        trackDao = get()
+        )
+    }
+
+    single<PlaylistRepository> {
+        PlaylistRepositoryImpl(get(), get(), get())
     }
 
     single<TrackRepositoryImpl> {

@@ -5,6 +5,8 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.playlistmaker.mediaLibrary.domain.interactor.FavoriteInteractor
+import com.example.playlistmaker.mediaLibrary.domain.interactor.PlaylistInteractor
+import com.example.playlistmaker.mediaLibrary.domain.models.Playlist
 import com.example.playlistmaker.player.domain.interactor.PlayerInteractor
 import com.example.playlistmaker.player.domain.models.PlayerState
 import com.example.playlistmaker.player.domain.models.PlaybackProgress
@@ -13,7 +15,8 @@ import kotlinx.coroutines.launch
 
 class PlayerViewModel(
     private val playerInteractor: PlayerInteractor,
-    private val favoriteInteractor: FavoriteInteractor
+    private val favoriteInteractor: FavoriteInteractor,
+    private val playlistInteractor: PlaylistInteractor
 ) : ViewModel() {
 
     private val _playerState = MutableLiveData<PlayerState>(PlayerState.Default)
@@ -24,6 +27,14 @@ class PlayerViewModel(
 
     private val _isFavorite = MutableLiveData<Boolean>()
     val isFavorite: LiveData<Boolean> = _isFavorite
+
+    private val _playlists = MutableLiveData<List<Playlist>>()
+    val playlists: LiveData<List<Playlist>> = _playlists
+
+    private val _addToPlaylistStatus = MutableLiveData<Pair<Boolean, String>?>()
+    val addToPlaylistStatus: LiveData<Pair<Boolean, String>?> = _addToPlaylistStatus
+
+    private var currentTrack: Track? = null
 
     init {
         viewModelScope.launch {
@@ -40,6 +51,7 @@ class PlayerViewModel(
     }
 
     fun setupTrack(track: Track) {
+        currentTrack = track
         viewModelScope.launch {
             val isFavorite = favoriteInteractor.isFavorite(track.trackId)
             track.isFavorite = isFavorite
@@ -64,6 +76,26 @@ class PlayerViewModel(
                 _isFavorite.value = true
             }
         }
+    }
+
+    fun loadPlaylists() {
+        viewModelScope.launch {
+            playlistInteractor.getAllPlaylists().collect { playlists ->
+                _playlists.value = playlists
+            }
+        }
+    }
+
+    fun addTrackToPlaylist(playlist: Playlist) {
+        val track = currentTrack ?: return
+        viewModelScope.launch {
+            val success = playlistInteractor.addTrackToPlaylist(playlist, track)
+            _addToPlaylistStatus.value = Pair(success, playlist.name)
+        }
+    }
+
+    fun resetAddToPlaylistStatus() {
+        _addToPlaylistStatus.value = null
     }
 
     override fun onCleared() {

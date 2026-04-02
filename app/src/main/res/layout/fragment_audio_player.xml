@@ -1,16 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.coordinatorlayout.widget.CoordinatorLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/background"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     tools:context=".player.ui.fragments.AudioPlayerFragment">
 
-    <androidx.constraintlayout.widget.ConstraintLayout
+    <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
 
         <Button style="@style/ButtonBack"
             android:id="@+id/back"
@@ -199,3 +204,18 @@
             app:constraint_referenced_ids="country,country2" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 </androidx.core.widget.NestedScrollView>
+<View
+android:id="@+id/overlay"
+android:layout_width="match_parent"
+android:layout_height="match_parent"
+android:background="#99000000"
+android:visibility="gone" />
+
+<include
+android:id="@+id/playlistsBottomSheet"
+layout="@layout/bottom_sheet_playlists"
+android:layout_width="match_parent"
+android:layout_height="match_parent"
+app:layout_behavior="com.google.android.material.bottomsheet.BottomSheetBehavior"/>
+
+    </androidx.coordinatorlayout.widget.CoordinatorLayout>

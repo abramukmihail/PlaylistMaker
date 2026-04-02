@@ -8,18 +8,22 @@ import com.example.playlistmaker.mediaLibrary.domain.interactor.PlaylistInteract
 import com.example.playlistmaker.mediaLibrary.domain.models.Playlist
 import kotlinx.coroutines.launch
 
-class PlaylistsViewModel(
+class NewPlaylistViewModel(
     private val playlistInteractor: PlaylistInteractor
 ) : ViewModel() {
 
-    private val _playlists = MutableLiveData<List<Playlist>>()
-    val playlists: LiveData<List<Playlist>> = _playlists
+    private val _createPlaylistResult = MutableLiveData<Boolean>()
+    val createPlaylistResult: LiveData<Boolean> = _createPlaylistResult
 
-    fun loadPlaylists() {
+    fun createPlaylist(name: String, description: String?, coverPath: String?) {
         viewModelScope.launch {
-            playlistInteractor.getAllPlaylists().collect { playlists ->
-                _playlists.postValue(playlists)
-            }
+            val playlist = Playlist(
+                name = name,
+                description = description,
+                coverPath = coverPath
+            )
+            playlistInteractor.createPlaylist(playlist, coverPath)
+            _createPlaylistResult.postValue(true)
         }
     }
 }
