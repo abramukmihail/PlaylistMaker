@@ -17,7 +17,8 @@ import android.util.TypedValue
 
 class TrackAdapter(
     private var tracks: List<Track>,
-    private val onTrackClick: (Track) -> Unit
+    private val onTrackClick: (Track) -> Unit,
+    private val onTrackLongClick: ((Track) -> Unit)? = null
 ) : RecyclerView.Adapter<TrackAdapter.TrackViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): TrackViewHolder {
@@ -30,9 +31,14 @@ class TrackAdapter(
     }
 
     override fun onBindViewHolder(holder: TrackViewHolder, position: Int) {
-        holder.bind(tracks[position])
+        val track = tracks[position]
+        holder.bind(track)
         holder.itemView.setOnClickListener {
-            onTrackClick(tracks[position])
+            onTrackClick(track)
+        }
+        holder.itemView.setOnLongClickListener {
+            onTrackLongClick?.invoke(track)
+            true
         }
     }
 

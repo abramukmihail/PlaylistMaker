@@ -12,7 +12,7 @@ import com.example.playlistmaker.mediaLibrary.data.db.entity.PlaylistTrackEntity
 import com.example.playlistmaker.mediaLibrary.data.db.entity.TrackEntity
 
 @Database(
-    version = 5,
+    version = 6,
     entities = [
         FavoriteTrackEntity::class,
         PlaylistEntity::class,

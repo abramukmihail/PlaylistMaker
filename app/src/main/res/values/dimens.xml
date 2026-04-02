@@ -24,6 +24,9 @@
     <dimen name="size_30dp">30dp</dimen>
     <dimen name="size_14dp">14dp</dimen>
     <dimen name="small_cover_radius">2dp</dimen>
+    <dimen name="bottom_sheet_peek_height">266dp</dimen>
+    <dimen name="bottom_sheet_peek_height_menu">383dp</dimen>
+    <dimen name="bottom_sheet_expanded_offset">200dp</dimen>
 
 
 

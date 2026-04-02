@@ -6,6 +6,7 @@
     android:background="@drawable/dialog_background">
 
     <TextView
+        android:id="@+id/tvTitle"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="@string/finish_creating_playlist"
@@ -14,9 +15,11 @@
         android:textFontWeight="400"
         android:layout_marginStart="@dimen/size_24dp"
         android:layout_marginEnd="@dimen/size_8dp"
-        android:layout_marginTop="23dp"/>
+        android:layout_marginTop="23dp"
+        android:visibility="gone"/>
 
     <TextView
+        android:id="@+id/tvMessage"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="@string/unsaved_data_will_be_lost"
@@ -24,7 +27,8 @@
         android:textSize="14sp"
         android:textFontWeight="400"
         android:layout_marginStart="@dimen/size_24dp"
-        android:layout_marginEnd="@dimen/size_8dp"/>
+        android:layout_marginEnd="@dimen/size_8dp"
+        android:visibility="gone"/>
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -42,7 +46,8 @@
             android:layout_height="wrap_content"
             android:text="@string/cancel"
             android:textColor="@color/blue"
-            android:textSize="@dimen/text_size_16sp" />
+            android:textSize="14sp"
+            android:visibility="gone"/>
 
         <Button
             android:id="@+id/btnFinish"
@@ -51,8 +56,29 @@
             android:layout_height="wrap_content"
             android:text="@string/finish"
             android:textColor="@color/blue"
-            android:textSize="@dimen/text_size_16sp"
-            android:layout_marginStart="@dimen/size_16dp" />
+            android:textSize="14sp"
+            android:layout_marginStart="@dimen/size_16dp"
+            android:visibility="gone"/>
+        <Button
+            android:id="@+id/btnNo"
+            style="@style/Widget.MaterialComponents.Button.TextButton"
+            android:layout_width="48dp"
+            android:layout_height="wrap_content"
+            android:text="@string/no"
+            android:textColor="@color/blue"
+            android:textSize="14sp"
+            android:visibility="gone"/>
+
+        <Button
+            android:id="@+id/btnYes"
+            style="@style/Widget.MaterialComponents.Button.TextButton"
+            android:layout_width="46dp"
+            android:layout_height="wrap_content"
+            android:text="@string/yes"
+            android:textColor="@color/blue"
+            android:textSize="14sp"
+            android:layout_marginStart="@dimen/size_16dp"
+            android:visibility="gone"/>
 
     </LinearLayout>
 

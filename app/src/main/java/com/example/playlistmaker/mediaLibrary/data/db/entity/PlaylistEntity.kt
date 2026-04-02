@@ -11,5 +11,6 @@ data class PlaylistEntity(
     val description: String?,
     val imagePath: String?,
     val trackIds: String,
-    val tracksCount: Int
+    val tracksCount: Int,
+    val createdAt: Long = System.currentTimeMillis()
 )
