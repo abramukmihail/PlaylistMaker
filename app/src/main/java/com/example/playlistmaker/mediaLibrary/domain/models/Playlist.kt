@@ -9,5 +9,6 @@ data class Playlist(
     val name: String,
     val description: String?,
     val coverPath: String?,
-    val trackCount: Int = 0
+    val trackCount: Int = 0,
+    val createdAt: Long = System.currentTimeMillis()
 ) : Parcelable

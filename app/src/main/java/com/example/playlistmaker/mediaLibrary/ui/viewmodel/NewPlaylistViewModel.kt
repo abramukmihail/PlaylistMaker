@@ -8,7 +8,7 @@ import com.example.playlistmaker.mediaLibrary.domain.interactor.PlaylistInteract
 import com.example.playlistmaker.mediaLibrary.domain.models.Playlist
 import kotlinx.coroutines.launch
 
-class NewPlaylistViewModel(
+open class NewPlaylistViewModel(
     private val playlistInteractor: PlaylistInteractor
 ) : ViewModel() {
 

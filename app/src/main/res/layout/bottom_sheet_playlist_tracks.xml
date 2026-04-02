@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/root"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:background="@drawable/bottom_sheet_bg"
+    app:behavior_hideable="false"
+    app:behavior_peekHeight="0dp"
+    app:behavior_skipCollapsed="false"
+    >
+
+    <View
+        android:layout_width="50dp"
+        android:layout_height="4dp"
+        android:layout_marginTop="@dimen/size_8dp"
+        android:layout_marginBottom="@dimen/size_12dp"
+        android:layout_gravity="center_horizontal"
+        android:background="@drawable/bottom_sheet_handle" />
+
+    <TextView style="@style/Text16"
+        android:id="@+id/tvEmptyState"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/no_tracks"
+        android:gravity="center"
+        android:paddingVertical="32dp"
+        android:visibility="gone" />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/tracks_recycler_view"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:clipToPadding="false"
+        android:paddingBottom="@dimen/size_16dp"
+        android:nestedScrollingEnabled="true"
+        android:visibility="gone"/>
+
+</LinearLayout>

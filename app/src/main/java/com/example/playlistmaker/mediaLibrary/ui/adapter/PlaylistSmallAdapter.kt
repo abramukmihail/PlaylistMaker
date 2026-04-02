@@ -46,7 +46,7 @@ class PlaylistSmallAdapter(
             binding.playlistName2.text = playlist.name
 
             val trackCountText = itemView.context.resources.getQuantityString(
-                R.plurals.track_count,
+                R.plurals.tracks,
                 playlist.trackCount,
                 playlist.trackCount
             )

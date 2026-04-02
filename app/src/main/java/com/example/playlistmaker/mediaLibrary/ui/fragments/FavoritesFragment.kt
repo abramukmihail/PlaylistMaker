@@ -37,9 +37,11 @@ class FavoritesFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        favoritesAdapter = TrackAdapter(emptyList()) { track ->
-            navigateToPlayer(track)
-        }
+        favoritesAdapter = TrackAdapter(
+            tracks = emptyList(),
+            onTrackClick = { track -> navigateToPlayer(track) },
+            onTrackLongClick = null
+        )
 
         binding.favoritesRecyclerView.apply {
             adapter = favoritesAdapter

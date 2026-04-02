@@ -44,16 +44,24 @@ class SearchFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        adapter = TrackAdapter(emptyList()) { track ->
-            if (viewModel.clickDebounce()) {
-                onTrackClick(track)
-            }
-        }
-        historyAdapter = TrackAdapter(emptyList()) { track ->
-            if (viewModel.clickDebounce()) {
-                onTrackClick(track)
-            }
-        }
+        adapter = TrackAdapter(
+            tracks = emptyList(),
+            onTrackClick = { track ->
+                if (viewModel.clickDebounce()) {
+                    onTrackClick(track)
+                }
+            },
+            onTrackLongClick = null
+        )
+        historyAdapter = TrackAdapter(
+            tracks = emptyList(),
+            onTrackClick = { track ->
+                if (viewModel.clickDebounce()) {
+                    onTrackClick(track)
+                }
+            },
+            onTrackLongClick = null
+        )
 
         setupViews()
         setupObservers()
