@@ -6,6 +6,7 @@ import androidx.lifecycle.viewModelScope
 import com.example.playlistmaker.mediaLibrary.domain.interactor.PlaylistInteractor
 import com.example.playlistmaker.mediaLibrary.domain.models.Playlist
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.Dispatchers
 
 class EditPlaylistViewModel(
     private val playlistInteractor: PlaylistInteractor
@@ -24,7 +25,7 @@ class EditPlaylistViewModel(
     }
 
     fun updatePlaylist(id: Int, name: String, description: String?, coverPath: String?) {
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             val updatedPlaylist = Playlist(
                 id = id,
                 name = name,

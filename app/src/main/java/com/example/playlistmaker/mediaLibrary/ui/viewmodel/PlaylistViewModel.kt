@@ -67,25 +67,27 @@ class PlaylistViewModel(
     }
 
     fun removeTrackFromPlaylist(playlistId: Int, trackId: Int) {
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO)  {
             _deleteTrackResult.postValue(OperationResult.Loading)
             val success = try {
                 playlistInteractor.removeTrackFromPlaylist(playlistId, trackId)
             } catch (e: Exception) {
                 false
             }
-            if (success) {
-                _deleteTrackResult.value = OperationResult.Success
-                loadPlaylistTracks(playlistId)
-                loadPlaylistInfo(playlistId)
-            } else {
-                _deleteTrackResult.value = OperationResult.Error()
+            withContext(Dispatchers.Main) {
+                if (success) {
+                    _deleteTrackResult.value = OperationResult.Success
+                    loadPlaylistTracks(playlistId)
+                    loadPlaylistInfo(playlistId)
+                } else {
+                    _deleteTrackResult.value = OperationResult.Error()
+                }
             }
         }
     }
 
     fun deletePlaylist(playlistId: Int) {
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             _deletePlaylistResult.postValue(OperationResult.Loading)
             val playlist = playlistInteractor.getPlaylistById(playlistId)
             val success = playlist?.let {
@@ -95,10 +97,12 @@ class PlaylistViewModel(
                     false
                 }
             } ?: false
+            withContext(Dispatchers.Main) {
             _deletePlaylistResult.value = if (success) {
                 OperationResult.Success
             } else {
                 OperationResult.Error()
+            }
             }
         }
     }
