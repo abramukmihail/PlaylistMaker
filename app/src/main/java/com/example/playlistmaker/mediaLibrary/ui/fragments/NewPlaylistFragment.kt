@@ -3,7 +3,6 @@ package com.example.playlistmaker.mediaLibrary.ui.fragments
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.net.Uri
-import android.widget.Button
 import android.os.Bundle
 import android.os.Environment
 import android.text.Editable
@@ -11,7 +10,8 @@ import android.text.TextWatcher
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
+import android.widget.Button
+import android.widget.TextView
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
@@ -34,7 +34,7 @@ open class NewPlaylistFragment : Fragment() {
 
     private val viewModel: NewPlaylistViewModel by viewModel()
 
-    private var imageUri: Uri? = null
+    protected var imageUri: Uri? = null
 
     private val pickMedia = registerForActivityResult(ActivityResultContracts.PickVisualMedia()) { uri ->
         if (uri != null) {
@@ -81,7 +81,7 @@ open class NewPlaylistFragment : Fragment() {
 
             viewModel.createPlaylist(name, description, imagePath)
             
-            CustomSnackbar.show(requireView(), getString(R.string.playlist_created, name))
+            CustomSnackbar.show(requireActivity().findViewById(android.R.id.content), getString(R.string.playlist_created, name))
             findNavController().popBackStack()
         }
     }
@@ -110,7 +110,7 @@ open class NewPlaylistFragment : Fragment() {
         binding.tilNameContainer.defaultHintTextColor = colorStateList
     }
 
-    private fun handleExit() {
+    open fun handleExit() {
         if (imageUri != null || !binding.tilName.text.isNullOrBlank() || !binding.tilDescription.text.isNullOrBlank()) {
             showConfirmDialog()
         } else {
@@ -119,23 +119,34 @@ open class NewPlaylistFragment : Fragment() {
     }
 
     private fun showConfirmDialog() {
-        val dialogView = layoutInflater.inflate(R.layout.dialog_exit_confirmation, null)
+        val dialogView = layoutInflater.inflate(R.layout.dialog_confirmation, null)
+        val title = dialogView.findViewById<TextView>(R.id.tvTitle)
+        val message = dialogView.findViewById<TextView>(R.id.tvMessage)
+        val btnCancel = dialogView.findViewById<Button>(R.id.btnCancel)
+        val btnFinish = dialogView.findViewById<Button>(R.id.btnFinish)
 
-        val dialog = MaterialAlertDialogBuilder(requireContext())
+        title.text = getString(R.string.exit_playlist_creation)
+        title.visibility = View.VISIBLE
+        message.text = getString(R.string.unsaved_data_warning)
+        message.visibility = View.VISIBLE
+        btnCancel.visibility = View.VISIBLE
+        btnFinish.visibility = View.VISIBLE
+
+        val dialog = MaterialAlertDialogBuilder(requireContext(), R.style.AlertDialogTheme)
             .setView(dialogView)
             .show()
 
-        dialogView.findViewById<Button>(R.id.btnCancel).setOnClickListener {
+        btnCancel.setOnClickListener {
             dialog.dismiss()
         }
 
-        dialogView.findViewById<Button>(R.id.btnFinish).setOnClickListener {
+        btnFinish.setOnClickListener {
             dialog.dismiss()
             findNavController().popBackStack()
         }
     }
 
-    private fun saveImageToInternalStorage(uri: Uri, playlistName: String): String {
+    protected fun saveImageToInternalStorage(uri: Uri, playlistName: String): String {
         val filePath = File(requireActivity().getExternalFilesDir(Environment.DIRECTORY_PICTURES), "playlist_covers")
         if (!filePath.exists()) {
             filePath.mkdirs()

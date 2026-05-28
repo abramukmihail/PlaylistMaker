@@ -4,19 +4,21 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.os.bundleOf
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
 import com.example.playlistmaker.R
-import com.example.playlistmaker.databinding.FragmentPlaylistBinding
+import com.example.playlistmaker.databinding.FragmentPlaylistListBinding
+import com.example.playlistmaker.mediaLibrary.domain.models.Playlist
 import com.example.playlistmaker.mediaLibrary.ui.adapter.PlaylistAdapter
 import com.example.playlistmaker.mediaLibrary.ui.viewmodel.PlaylistsViewModel
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
-class PlaylistsFragment : Fragment() {
+class PlaylistsListFragment : Fragment() {
 
-    private var _binding: FragmentPlaylistBinding? = null
+    private var _binding: FragmentPlaylistListBinding? = null
     private val binding get() = _binding!!
     private val viewModel: PlaylistsViewModel by viewModel()
 
@@ -27,7 +29,7 @@ class PlaylistsFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        _binding = FragmentPlaylistBinding.inflate(inflater, container, false)
+        _binding = FragmentPlaylistListBinding.inflate(inflater, container, false)
         return binding.root
     }
 
@@ -37,13 +39,14 @@ class PlaylistsFragment : Fragment() {
         setupRecyclerView()
         setupClickListeners()
         observeViewModel()
-
-        viewModel.loadPlaylists()
     }
 
     private fun setupRecyclerView() {
         playlistAdapter = PlaylistAdapter(emptyList()) { playlist ->
-
+            findNavController().navigate(
+                R.id.action_mediaLibraryFragment_to_playlistFragment,
+                bundleOf("playlist_id" to playlist.id)
+            )
         }
 
         binding.playlistsRecyclerView.apply {
@@ -73,7 +76,7 @@ class PlaylistsFragment : Fragment() {
         binding.playlistsRecyclerView.isVisible = false
     }
 
-    private fun showContentState(playlists: List<com.example.playlistmaker.mediaLibrary.domain.models.Playlist>) {
+    private fun showContentState(playlists: List<Playlist>) {
         binding.emptyStateLayout.isVisible = false
         binding.playlistsRecyclerView.isVisible = true
         playlistAdapter?.updatePlaylists(playlists)

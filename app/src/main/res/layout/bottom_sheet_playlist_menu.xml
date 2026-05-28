@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/root"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:minHeight="383dp"
+    android:orientation="vertical"
+    android:background="@drawable/bottom_sheet_bg"
+    app:behavior_hideable="true"
+    app:behavior_peekHeight="240dp"
+    android:visibility="gone">
+
+    <View
+        android:layout_width="50dp"
+        android:layout_height="4dp"
+        android:layout_marginTop="@dimen/size_8dp"
+        android:layout_marginBottom="@dimen/size_12dp"
+        android:layout_gravity="center_horizontal"
+        android:background="@drawable/bottom_sheet_handle" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:paddingHorizontal="@dimen/size_12dp"
+        android:paddingVertical="@dimen/size_8dp">
+
+        <com.google.android.material.imageview.ShapeableImageView
+            android:id="@+id/menu_cover"
+            android:layout_width="@dimen/size_45dp"
+            android:layout_height="@dimen/size_45dp"
+            android:contentDescription="@string/art"
+            android:scaleType="centerCrop"
+            android:src="@drawable/ic_placeholder_45"
+            app:shapeAppearanceOverlay="@style/RoundedCornersOverlay2" />
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_marginStart="@dimen/size_8dp"
+            android:paddingTop="6dp"
+            android:orientation="vertical"
+            android:gravity="center_vertical">
+
+            <TextView
+                android:id="@+id/menu_playlist_name"
+                style="@style/Text16"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:maxLines="1"
+                android:ellipsize="end"
+                tools:text="Best songs 2021" />
+
+            <TextView
+                android:id="@+id/menu_playlist_track_count"
+                style="@style/TextArtist"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="1dp"
+                tools:text="98 треков" />
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_marginVertical="@dimen/size_8dp"
+        android:background="@color/gray" />
+
+    <TextView
+        android:id="@+id/btn_share"
+        style="@style/Text16"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/size_61dp"
+        android:gravity="center_vertical|start"
+        android:paddingHorizontal="@dimen/size_16dp"
+        android:text="@string/send2" />
+
+    <TextView
+        android:id="@+id/btn_edit"
+        style="@style/Text16"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/size_61dp"
+        android:gravity="center_vertical|start"
+        android:paddingHorizontal="@dimen/size_16dp"
+        android:text="@string/edit" />
+
+    <TextView
+        android:id="@+id/btn_delete_playlist"
+        style="@style/Text16"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/size_61dp"
+        android:gravity="center_vertical|start"
+        android:paddingHorizontal="@dimen/size_16dp"
+        android:text="@string/delete_playlist" />
+
+</LinearLayout>
