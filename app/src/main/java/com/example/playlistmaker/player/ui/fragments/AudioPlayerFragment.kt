@@ -21,6 +21,7 @@ import com.example.playlistmaker.search.domain.models.Track
 import com.example.playlistmaker.utils.CustomSnackbar
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import java.text.SimpleDateFormat
+import com.example.playlistmaker.player.ui.custom.PlaybackButtonView
 import java.util.Locale
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
@@ -111,9 +112,11 @@ class AudioPlayerFragment : Fragment() {
             findNavController().popBackStack()
         }
 
-        binding.startStop.setOnClickListener {
-            viewModel.togglePlayback()
-        }
+        binding.playbackButton.setOnPlaybackClickListener(object : PlaybackButtonView.OnPlaybackClickListener {
+            override fun onPlaybackClick() {
+                viewModel.togglePlayback()
+            }
+        })
 
         binding.toFavourites.setOnClickListener {
             viewModel.onFavoriteClicked(track)
@@ -227,18 +230,18 @@ class AudioPlayerFragment : Fragment() {
     private fun updatePlayerState(state: PlayerState) {
         when (state) {
             is PlayerState.Default, is PlayerState.Idle, is PlayerState.Preparing -> {
-                binding.startStop.setImageResource(R.drawable.ic_play_100)
-                binding.startStop.isEnabled = false
+                binding.playbackButton.setPlaybackState(false)
+                binding.playbackButton.isEnabled = false
             }
 
             is PlayerState.Prepared, is PlayerState.Paused, is PlayerState.Completed -> {
-                binding.startStop.setImageResource(R.drawable.ic_play_100)
-                binding.startStop.isEnabled = true
+                binding.playbackButton.setPlaybackState(false)
+                binding.playbackButton.isEnabled = true
             }
 
             is PlayerState.Playing -> {
-                binding.startStop.setImageResource(R.drawable.ic_pause_100)
-                binding.startStop.isEnabled = true
+                binding.playbackButton.setPlaybackState(true)
+                binding.playbackButton.isEnabled = true
             }
         }
     }
