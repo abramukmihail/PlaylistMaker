@@ -3,7 +3,6 @@ package com.example.playlistmaker.di
 import android.content.Context
 import android.media.MediaPlayer
 import androidx.room.Room
-import com.example.playlistmaker.player.data.repository.PlayerRepositoryImpl
 import android.content.SharedPreferences
 import com.example.playlistmaker.mediaLibrary.data.db.AppDatabase
 import com.example.playlistmaker.mediaLibrary.data.db.dao.FavoriteTrackDao
@@ -14,7 +13,6 @@ import com.example.playlistmaker.mediaLibrary.data.repository.FavoriteRepository
 import com.example.playlistmaker.mediaLibrary.data.repository.PlaylistRepositoryImpl
 import com.example.playlistmaker.mediaLibrary.domain.repository.FavoriteRepository
 import com.example.playlistmaker.mediaLibrary.domain.repository.PlaylistRepository
-import com.example.playlistmaker.player.domain.repository.PlayerRepository
 import com.example.playlistmaker.search.data.network.ItunesApi
 import com.example.playlistmaker.search.data.network.NetworkClient
 import com.example.playlistmaker.search.data.network.RetrofitNetworkClient
@@ -101,11 +99,5 @@ val dataModule = module {
     single<SettingsRepositoryImpl> {
         SettingsRepositoryImpl(get(named("settings_prefs")))
     }
-    factory { { MediaPlayer() } }
 
-    single<PlayerRepository> {
-        PlayerRepositoryImpl(
-            mediaPlayerProvider = get()
-        )
-    }
 }
