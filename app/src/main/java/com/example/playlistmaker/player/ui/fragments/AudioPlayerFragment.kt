@@ -153,7 +153,10 @@ class AudioPlayerFragment : Fragment() {
         }
     }
     private fun bindPlayerService() {
-        val intent = Intent(requireContext(), PlayerService::class.java)
+        val track = currentTrack ?: return
+        val intent = Intent(requireContext(), PlayerService::class.java).apply {
+            putExtra(PlayerService.EXTRA_TRACK, track)
+        }
         serviceConnection = object : ServiceConnection {
             override fun onServiceConnected(name: ComponentName?, binder: IBinder?) {
                 val localBinder = binder as? PlayerService.LocalBinder
@@ -322,13 +325,13 @@ class AudioPlayerFragment : Fragment() {
     }
     override fun onResume() {
         super.onResume()
-        viewModel.onAppBackgroundChanged(false)
+        viewModel.onAppForegrounded()
     }
 
     override fun onPause() {
         super.onPause()
         if (viewModel.playerState.value is PlayerState.Playing) {
-            viewModel.onAppBackgroundChanged(true)
+            viewModel.onAppBackgrounded()
         }
     }
 

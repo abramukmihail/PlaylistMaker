@@ -41,7 +41,6 @@ class PlayerViewModel(
         subscribeToService()
 
         currentTrack?.let { track ->
-            service.setCurrentTrack(track)
             service.prepare(track)
         }
     }
@@ -52,10 +51,7 @@ class PlayerViewModel(
             val isFavorite = favoriteInteractor.isFavorite(track.trackId)
             track.isFavorite = isFavorite
             _isFavorite.value = isFavorite
-            service?.let {
-                it.setCurrentTrack(track)
-                it.prepare(track)
-            }
+            service?.prepare(track)
         }
     }
 
@@ -97,15 +93,19 @@ class PlayerViewModel(
         _addToPlaylistStatus.value = null
     }
 
-    fun onAppBackgroundChanged(background: Boolean) {
-        service?.setAppInBackground(background)
+    fun onAppBackgrounded() {
+        service?.startForegroundMode()
+    }
+
+    fun onAppForegrounded() {
+        service?.stopForegroundMode()
     }
     private fun subscribeToService() {
         viewModelScope.launch {
             service?.state?.collect { state ->
                 _playerState.value = state
                 if (state is PlayerState.Completed) {
-                    onAppBackgroundChanged(false)
+                    onAppForegrounded()
                 }
             }
         }

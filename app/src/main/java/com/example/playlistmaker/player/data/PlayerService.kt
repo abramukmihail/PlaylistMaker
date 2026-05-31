@@ -43,8 +43,11 @@ class PlayerService : Service(), PlayerServiceConnection {
     override val progress = _progress.asSharedFlow()
 
     private var progressJob: Job? = null
-    private var isBackground = false
+    private var isForegroundMode = false
+
     private var currentTrack: Track? = null
+    private var currentTrackName: String? = null
+    private var currentArtistName: String? = null
 
     private val binder = LocalBinder()
 
@@ -94,6 +97,16 @@ class PlayerService : Service(), PlayerServiceConnection {
     }
 
     override fun onBind(intent: Intent?): IBinder {
+        currentTrack = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            intent?.getParcelableExtra(EXTRA_TRACK, Track::class.java)
+        } else {
+            @Suppress("DEPRECATION")
+            intent?.getParcelableExtra(EXTRA_TRACK)
+        }
+        currentTrack?.let {
+            currentTrackName = it.trackName
+            currentArtistName = it.artistName
+        }
         return binder
     }
 
@@ -105,13 +118,11 @@ class PlayerService : Service(), PlayerServiceConnection {
         mediaPlayer = null
     }
 
-    override fun setCurrentTrack(track: Track) {
-        currentTrack = track
-    }
-
     override fun prepare(track: Track) {
         release()
         currentTrack = track
+        currentTrackName = track.trackName
+        currentArtistName = track.artistName
         _state.value = PlayerState.Preparing
         val url = track.previewUrl.orEmpty()
         if (url.isEmpty()) {
@@ -161,9 +172,18 @@ class PlayerService : Service(), PlayerServiceConnection {
         stopForegroundNotification()
     }
 
-    override fun setAppInBackground(background: Boolean) {
-        isBackground = background
-        updateForegroundNotification()
+    override fun startForegroundMode() {
+        if (!isForegroundMode) {
+            isForegroundMode = true
+            updateForegroundNotification()
+        }
+    }
+
+    override fun stopForegroundMode() {
+        if (isForegroundMode) {
+            isForegroundMode = false
+            updateForegroundNotification()
+        }
     }
 
     override fun isPlaying(): Boolean {
@@ -172,7 +192,7 @@ class PlayerService : Service(), PlayerServiceConnection {
 
     private fun updateForegroundNotification() {
         val playing = _state.value is PlayerState.Playing
-        if (isBackground && playing && _state.value != PlayerState.Completed) {
+        if (isForegroundMode && playing && _state.value != PlayerState.Completed) {
             showForegroundNotification()
         } else {
             stopForegroundNotification()
@@ -180,8 +200,8 @@ class PlayerService : Service(), PlayerServiceConnection {
     }
 
     private fun showForegroundNotification() {
-        val artist = currentTrack?.artistName.orEmpty()
-        val trackName = currentTrack?.trackName.orEmpty()
+        val artist = currentArtistName.orEmpty()
+        val trackName = currentTrackName.orEmpty()
 
         val notification = NotificationCompat.Builder(this, NOTIFICATION_CHANNEL_ID)
             .setContentTitle(getString(R.string.app_name))
@@ -233,5 +253,6 @@ class PlayerService : Service(), PlayerServiceConnection {
         const val NOTIFICATION_CHANNEL_ID = "playback_channel"
         const val NOTIFICATION_ID = 101
         private const val PROGRESS_UPDATE_INTERVAL_MILLIS = 300L
+        const val EXTRA_TRACK = "extra_track"
     }
 }
