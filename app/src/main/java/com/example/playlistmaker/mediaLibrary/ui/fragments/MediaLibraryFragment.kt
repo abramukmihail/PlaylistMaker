@@ -4,56 +4,36 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.compose.runtime.getValue
+import androidx.compose.ui.platform.ComposeView
 import androidx.fragment.app.Fragment
-import com.example.playlistmaker.R
-import com.example.playlistmaker.mediaLibrary.ui.adapter.MediaLibraryViewPagerAdapter
-import com.example.playlistmaker.databinding.FragmentMediaLibraryBinding
-import com.google.android.material.tabs.TabLayoutMediator
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.example.playlistmaker.mediaLibrary.ui.MediaLibraryScreen
+import com.example.playlistmaker.mediaLibrary.ui.viewmodel.MediaLibraryViewModel
+import com.example.playlistmaker.settings.ui.viewmodel.SettingsViewModel
+import org.koin.android.ext.android.inject
+import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class MediaLibraryFragment : Fragment() {
 
-    private var _binding: FragmentMediaLibraryBinding? = null
-    private val binding get() = _binding!!
-    private lateinit var tabMediator: TabLayoutMediator
+    private val settingsViewModel: SettingsViewModel by inject()
+    private val mediaLibraryViewModel: MediaLibraryViewModel by viewModel()
 
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        _binding = FragmentMediaLibraryBinding.inflate(inflater, container, false)
-        return binding.root
-    }
-
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-
-        setupViewPager()
-        setupTabLayout()
-    }
-
-    private fun setupViewPager() {
-        binding.viewPager.adapter = MediaLibraryViewPagerAdapter(this)
-    }
-
-    private fun setupTabLayout() {
-        tabMediator = TabLayoutMediator(
-            binding.tabLayout,
-            binding.viewPager
-        ) { tab, position ->
-            when (position) {
-                0 -> tab.text = getString(R.string.favourites)
-                1 -> tab.text = getString(R.string.playlists)
+        return ComposeView(requireContext()).apply {
+            setContent {
+                val selectedTabIndex by mediaLibraryViewModel.selectedTabIndex.collectAsStateWithLifecycle()
+                MediaLibraryScreen(
+                    fragment = this@MediaLibraryFragment,
+                    settingsViewModel = settingsViewModel,
+                    selectedTabIndex = selectedTabIndex,
+                    onTabSelected = { mediaLibraryViewModel.setSelectedTabIndex(it) }
+                )
             }
         }
-        tabMediator.attach()
     }
-
-    override fun onDestroyView() {
-        super.onDestroyView()
-        tabMediator.detach()
-        binding.viewPager.adapter = null
-        _binding = null
-    }
-
 }

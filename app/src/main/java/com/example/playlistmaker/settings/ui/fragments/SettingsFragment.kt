@@ -8,60 +8,26 @@ import androidx.fragment.app.Fragment
 import com.example.playlistmaker.databinding.FragmentSettingsBinding
 import com.example.playlistmaker.settings.ui.viewmodel.SettingsViewModel
 import org.koin.androidx.viewmodel.ext.android.viewModel
+import androidx.compose.ui.platform.ComposeView
+import com.example.playlistmaker.settings.ui.SettingsScreen
+import org.koin.android.ext.android.inject
 
 class SettingsFragment : Fragment() {
-
-    private var _binding: FragmentSettingsBinding? = null
-    private val binding get() = _binding!!
-    private val viewModel: SettingsViewModel by viewModel()
+    private val viewModel: SettingsViewModel by inject()
 
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        _binding = FragmentSettingsBinding.inflate(inflater, container, false)
-        return binding.root
+        return ComposeView(requireContext()).apply {
+            setContent {
+                SettingsScreen(viewModel = viewModel)
+            }
+        }
     }
-
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-
-        setupClickListeners()
-        setupObservers()
+    override fun onResume() {
+        super.onResume()
         viewModel.loadThemeState()
-    }
-
-    private fun setupClickListeners() {
-        with(binding) {
-            shareAppContainer.setOnClickListener {
-                viewModel.shareApp()
-            }
-            supportContainer.setOnClickListener {
-                viewModel.contactSupport()
-            }
-            userAgreement.setOnClickListener {
-                viewModel.transitionAgreement()
-            }
-            themeSwitcher.setOnCheckedChangeListener { _, checked ->
-                viewModel.toggleDarkTheme(checked)
-            }
-        }
-    }
-
-    private fun setupObservers() {
-        viewModel.themeState.observe(viewLifecycleOwner) { isDarkTheme ->
-
-            binding.themeSwitcher.setOnCheckedChangeListener(null)
-            binding.themeSwitcher.isChecked = isDarkTheme
-            binding.themeSwitcher.setOnCheckedChangeListener { _, checked ->
-                viewModel.toggleDarkTheme(checked)
-            }
-        }
-    }
-
-    override fun onDestroyView() {
-        super.onDestroyView()
-        _binding = null
     }
 }

@@ -21,6 +21,8 @@ class SearchViewModel(
 
     private val _historyState = MutableLiveData<List<Track>>(emptyList())
     val historyState: LiveData<List<Track>> = _historyState
+    private val _savedQuery = MutableLiveData<String>("")
+    val savedQuery: LiveData<String> = _savedQuery
 
     private var latestSearchText: String? = null
     private var currentSearchJob: Job? = null
@@ -42,9 +44,10 @@ class SearchViewModel(
             currentSearchJob?.cancel()
             _searchState.value = SearchState.Empty
             loadHistory()
+            _savedQuery.value = ""
             return
         }
-        
+
         if (latestSearchText == query) return
 
         latestSearchText = query
@@ -53,6 +56,7 @@ class SearchViewModel(
 
     private fun performSearch(query: String) {
         if (query.isEmpty()) return
+        latestSearchText = query
         
         currentSearchJob?.cancel()
         _searchState.value = SearchState.Loading
@@ -82,6 +86,21 @@ class SearchViewModel(
         }
     }
 
+    fun saveQuery(query: String) {
+        _savedQuery.value = query
+    }
+    fun restoreQuery() {
+        val query = _savedQuery.value ?: ""
+        if (query.isNotEmpty()) {
+            searchDebounced(query)
+        }
+    }
+    fun retrySearch() {
+        val query = _savedQuery.value ?: ""
+        if (query.isNotEmpty()) {
+            performSearch(query)
+        }
+    }
     fun clickDebounce(): Boolean {
         val current = isClickAllowed
         if (isClickAllowed) {
