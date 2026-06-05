@@ -7,19 +7,18 @@ import androidx.lifecycle.viewModelScope
 import com.example.playlistmaker.mediaLibrary.domain.interactor.FavoriteInteractor
 import com.example.playlistmaker.mediaLibrary.domain.interactor.PlaylistInteractor
 import com.example.playlistmaker.mediaLibrary.domain.models.Playlist
-import com.example.playlistmaker.player.domain.interactor.PlayerInteractor
 import com.example.playlistmaker.player.domain.models.PlayerState
 import com.example.playlistmaker.player.domain.models.PlaybackProgress
 import com.example.playlistmaker.search.domain.models.Track
+import com.example.playlistmaker.player.domain.service.PlayerServiceConnection
 import kotlinx.coroutines.launch
 
 class PlayerViewModel(
-    private val playerInteractor: PlayerInteractor,
     private val favoriteInteractor: FavoriteInteractor,
     private val playlistInteractor: PlaylistInteractor
 ) : ViewModel() {
 
-    private val _playerState = MutableLiveData<PlayerState>(PlayerState.Default)
+    private val _playerState = MutableLiveData<PlayerState>(PlayerState.Idle)
     val playerState: LiveData<PlayerState> = _playerState
 
     private val _playbackProgress = MutableLiveData<PlaybackProgress?>()
@@ -35,18 +34,14 @@ class PlayerViewModel(
     val addToPlaylistStatus: LiveData<Pair<Boolean, String>?> = _addToPlaylistStatus
 
     private var currentTrack: Track? = null
+    private var service: PlayerServiceConnection? = null
 
-    init {
-        viewModelScope.launch {
-            playerInteractor.playerState.collect { state ->
-                _playerState.value = state
-            }
-        }
+    fun onServiceConnected(service: PlayerServiceConnection) {
+        this.service = service
+        subscribeToService()
 
-        viewModelScope.launch {
-            playerInteractor.playbackProgress.collect { progress ->
-                _playbackProgress.value = progress
-            }
+        currentTrack?.let { track ->
+            service.prepare(track)
         }
     }
 
@@ -56,12 +51,12 @@ class PlayerViewModel(
             val isFavorite = favoriteInteractor.isFavorite(track.trackId)
             track.isFavorite = isFavorite
             _isFavorite.value = isFavorite
-            playerInteractor.prepare(track.previewUrl)
+            service?.prepare(track)
         }
     }
 
     fun togglePlayback() {
-        playerInteractor.togglePlayback()
+        service?.playPause()
     }
 
     fun onFavoriteClicked(track: Track) {
@@ -98,8 +93,31 @@ class PlayerViewModel(
         _addToPlaylistStatus.value = null
     }
 
+    fun onAppBackgrounded() {
+        service?.startForegroundMode()
+    }
+
+    fun onAppForegrounded() {
+        service?.stopForegroundMode()
+    }
+    private fun subscribeToService() {
+        viewModelScope.launch {
+            service?.state?.collect { state ->
+                _playerState.value = state
+                if (state is PlayerState.Completed) {
+                    onAppForegrounded()
+                }
+            }
+        }
+        viewModelScope.launch {
+            service?.progress?.collect { progress ->
+                _playbackProgress.value = progress
+            }
+        }
+    }
     override fun onCleared() {
         super.onCleared()
-        playerInteractor.release()
+        service?.release()
     }
 }
+

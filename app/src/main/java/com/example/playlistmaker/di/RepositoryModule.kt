@@ -1,7 +1,6 @@
 package com.example.playlistmaker.di
 
-import com.example.playlistmaker.player.data.repository.PlayerRepositoryImpl
-import com.example.playlistmaker.player.domain.repository.PlayerRepository
+
 import com.example.playlistmaker.search.domain.repository.TrackRepository
 import com.example.playlistmaker.settings.domain.repository.SettingsRepository
 import org.koin.dsl.module
