@@ -10,6 +10,7 @@ import com.example.playlistmaker.mediaLibrary.ui.viewmodel.PlaylistsViewModel
 import com.example.playlistmaker.mediaLibrary.ui.viewmodel.NewPlaylistViewModel
 import com.example.playlistmaker.mediaLibrary.ui.viewmodel.EditPlaylistViewModel
 import org.koin.dsl.module
+import com.example.playlistmaker.mediaLibrary.ui.viewmodel.MediaLibraryViewModel
 
 val viewModelModule = module {
 
@@ -23,6 +24,7 @@ val viewModelModule = module {
             playlistInteractor = get()
         )
     }
+    viewModel { MediaLibraryViewModel(get()) }
 
     viewModel { PlaylistViewModel(get()) }
     
